@@ -1,38 +1,56 @@
 package node;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Hashtable;
+
+import util.PeerQueue;
 
 public class Peer {
+
 	private int peerId;
-	private int numFiles;
-	private ArrayList<String> fileNames;
-	private String directory;
 	private String address;
 	private int port;
-	
-	public Peer(int peerId, int numFiles, ArrayList<String> fileNames, String directory, String address, int port){
+	private String directory;
+	private ArrayList<String> fileNames;
+	private int numFiles;
+
+	private PeerQueue<Socket> peerQueue;
+
+	private Hashtable<String, String> hashtable;
+
+	public Peer(int peerId, String address, int port, String directory, ArrayList<String> fileNames, int numFiles) throws IOException {
 		this.peerId = peerId;
-		this.numFiles = numFiles;
-		this.fileNames = new ArrayList<String>();
-		this.fileNames.addAll(fileNames);
-		this.directory = directory;
 		this.address = address;
 		this.port = port;
-	}
-	
-	public Peer(String directory, ArrayList<String> fileNames, int numFiles,
-			String address, int port) {
-		this.numFiles = numFiles;
-		this.fileNames = new ArrayList<String>();
-		this.fileNames.addAll(fileNames);
 		this.directory = directory;
-		this.address = address;
-		this.port = port;
+		this.fileNames = fileNames;
+		this.numFiles = numFiles;
+
+		peerQueue = new PeerQueue<Socket>();
+		hashtable = new Hashtable<String, String>();
 	}
 
-	//getters
-	public int getPeerId(){
+	// getters
+	public int getPeerId() {
 		return peerId;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public PeerQueue<Socket> getPeerQueue() {
+		return peerQueue;
+	}
+
+	public Hashtable<String, String> getHashtable() {
+		return hashtable;
 	}
 	
 	public int getNumFiles(){
@@ -46,18 +64,26 @@ public class Peer {
 	public String getDirectory(){
 		return directory;
 	}
-	
-	public String getAddress(){
-		return address;
-	}
-	
-	public int getPort(){
-		return port;
-	}
-	
-	//setters
-	public void setPeerId(int peerId){
+
+	// setters
+	public void setPeerId(int peerId) {
 		this.peerId = peerId;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public void setPeerQueue(PeerQueue<Socket> peerQueue) {
+		this.peerQueue = peerQueue;
+	}
+
+	public void setHashtable(Hashtable<String, String> hashtable) {
+		this.hashtable = hashtable;
 	}
 	
 	public void setNumFiles(int numFiles){
@@ -75,24 +101,47 @@ public class Peer {
 	public void setDirectory(String directory){
 		this.directory = directory;
 	}
-	
-	public void setAddress(String address){
-		this.address = address;
+
+	// Queue methods
+	public void addToPeerQueue(Socket sock) {
+		peerQueue.add(sock);
 	}
-	
-	public void setPort(int port){
-		this.port = port;
+
+	public Socket peekPeerQueue() {
+		return peerQueue.peek();
 	}
-	
-	//methods
-	
-	public Boolean searchFile(String fileName){
-		for(String fn : fileNames){
-			if(fn.equals(fileName)){
-				return true;
-			}
+
+	public Socket pollPeerQueue() {
+		return peerQueue.poll();
+	}
+
+	// put
+	public Boolean put(String key, String value) throws Exception {
+		try {
+			hashtable.put(key, value);
+		} catch (Exception e) {
+			return false;
 		}
-		return false;
+		return true;
+	}
+
+	// get
+	public String get(String key) throws IOException {
+		return hashtable.get(key);
+	}
+
+	// delete
+	public Boolean delete(String key) {
+		if (!hashtable.containsKey(key))
+			return false;
+
+		try {
+			hashtable.remove(key);
+		} catch (Exception e) {
+			return false;
+		}
+
+		return true;
 	}
 
 }
