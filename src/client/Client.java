@@ -1,14 +1,19 @@
-package node;
+package client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import node.Peer;
+import server.Assign;
+import server.Server;
 import util.DistributedHashtable;
+import util.Util;
 
 public class Client extends Thread {
 
@@ -98,8 +103,8 @@ public class Client extends Thread {
 
 	public static void main(String[] args) throws IOException {
 		
-		if(args.length < 3){
-			System.out.println("Usage: java -jar build/OpenBench.jar <PeerId> <Address> <Port>");
+		if(args.length < 4){
+			System.out.println("Usage: java -jar build/OpenBench.jar <PeerId> <Address> <Port> <Folder>");
 			return;
 		}
 		
@@ -127,8 +132,16 @@ public class Client extends Thread {
 			System.out.println("Put a valid port number");
 			return;
 		}
-
-		Peer peer = new Peer(id, address, port);
+		
+		String dir = args[3];
+    	File folder = new File(dir);
+    	
+    	if(!folder.isDirectory()){
+			System.out.println("Put a valid directory name");
+			return;
+    	}
+    	ArrayList<String> fileNames = Util.listFilesForFolder(folder);
+		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
 
 		ServerSocket serverSocket = new ServerSocket(port);
 
