@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 
 import node.Peer;
+import node.server.Assign;
 import node.server.IndexingServer;
 import util.DistributedHashtable;
 import util.Util;
@@ -45,6 +46,10 @@ public class Deploy {
 			// start server
 			IndexingServer server = new IndexingServer(serverSocket, peer);
 			server.start();
+			
+			//start assign server
+			Assign assign = new Assign(peer);
+			assign.start();
 
 		}
 	}

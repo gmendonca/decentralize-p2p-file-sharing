@@ -2,26 +2,21 @@ package node.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import node.Peer;
-import node.server.Assign;
-import node.server.IndexingServer;
 import util.DistributedHashtable;
-import util.Util;
 
 public class Client extends Thread {
 
+	private Peer peer;
 	private static ArrayList<String> peerList;
-	public static int numPeers;
 
 	// put
-	public static Boolean put(String key, String value, int pId)
+	public static Boolean registry(String key, String value, int pId)
 			throws Exception {
 		if (key.length() > 24)
 			return false;
@@ -101,65 +96,11 @@ public class Client extends Thread {
 
 		return ack;
 	}
-
-	public static void main(String[] args) throws IOException {
-		
-		if(args.length < 4){
-			System.out.println("Usage: java -jar build/OpenBench.jar <PeerId> <Address> <Port> <Folder>");
-			return;
-		}
-		
-		peerList = DistributedHashtable.readConfigFile();
-
-		numPeers = peerList.size();
-
-		int id = 0;
-		try {
-			id = Integer.parseInt(args[0]);
-		} catch (Exception e) {
-			System.out.println("Put a valid Id");
-			return;
-		}
-		
-		if(id > peerList.size()){
-			System.out.println("Peer Id shouldn't be greater than the number provided in the config file!");
-			return;
-		}
-
-		String address = args[1];
-
-		int port = 0;
-		try {
-			port = Integer.parseInt(args[2]);
-		} catch (Exception e) {
-			System.out.println("Put a valid port number");
-			return;
-		}
-		
-		String dir = args[3];
-    	File folder = new File(dir);
-    	
-    	if(!folder.isDirectory()){
-			System.out.println("Put a valid directory name");
-			return;
-    	}
-    	ArrayList<String> fileNames = Util.listFilesForFolder(folder);
-		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
-
-		ServerSocket serverSocket = new ServerSocket(port);
-
-		// start server
-		IndexingServer server = new IndexingServer(serverSocket, peer);
-		server.start();
-
-		// start assign
-		Assign assign = new Assign(peer);
-		assign.start();
-
+	
+	public void userInterface(){
 		int option, pId;
 		String key = null, value = null;
 		Boolean result = false;
-
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			System.out.println("\n\nSelect the option:");
@@ -171,15 +112,10 @@ public class Client extends Thread {
 				option = scanner.nextInt();
 				if (option == 1) {
 
-					System.out.print("key: ");
-					key = scanner.next();
-					System.out.print("value: ");
-					value = scanner.next();
-					System.out.println(key + " " + value);
 					pId = DistributedHashtable.hash(key, peerList.size());
 					System.out.println(pId);
 					try {
-						result = put(key, value, pId);
+						result = registry(key, value, pId);
 					} catch (Exception e) {
 						System.out
 								.println("Couldn't put the key-value pair in the system.");
@@ -241,4 +177,16 @@ public class Client extends Thread {
 		}
 		scanner.close();
 	}
+	
+	public Client(Peer peer){
+		this.peer = peer;
+		
+		System.out.println("Runnning as Peer " + peer.getPeerId());
+		try {
+			peerList = DistributedHashtable.readConfigFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
