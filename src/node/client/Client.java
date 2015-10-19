@@ -16,85 +16,94 @@ public class Client extends Thread {
 
 	private Peer peer;
 	private static ArrayList<String> peerList;
+	private ArrayList<Socket> socketList;
+	
+	public Client(Peer peer, ArrayList<Socket> socketList){
+		this.peer = peer;
+
+		try {
+			peerList = DistributedHashtable.readConfigFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	// put
-	public static Boolean registry(String key, String value, int pId)
+	public Boolean registry(String key, String value, int pId)
 			throws Exception {
 		if (key.length() > 24)
 			return false;
 		if (value.length() > 1000)
 			return false;
 
-		String[] peerAddress = peerList.get(pId).split(":");
-		Socket socket = new Socket(peerAddress[0],
-				Integer.parseInt(peerAddress[1]));
-		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		Socket socket = socketList.get(pId);
+		boolean ack;
+		synchronized(socket){
+			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+			// put option
+			dOut.writeByte(0);
+			dOut.flush();
 
-		// put option
-		dOut.writeByte(0);
-		dOut.flush();
+			// key, value
+			dOut.writeUTF(key);
+			dOut.flush();
+			dOut.writeUTF(value);
+			dOut.flush();
 
-		// key, value
-		dOut.writeUTF(key);
-		dOut.writeUTF(value);
-		dOut.flush();
-
-		DataInputStream dIn = new DataInputStream(socket.getInputStream());
-		boolean ack = dIn.readBoolean();
-
-		socket.close();
+			DataInputStream dIn = new DataInputStream(socket.getInputStream());
+			ack = dIn.readBoolean();
+		}
 
 		return ack;
 	}
 
 	// get
-	public static String get(String key, int pId) throws IOException {
+	public String get(String key, int pId) throws IOException {
 		if (key.length() > 24)
 			return null;
 
-		String[] peerAddress = peerList.get(pId).split(":");
-		Socket socket = new Socket(peerAddress[0],
-				Integer.parseInt(peerAddress[1]));
-		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		Socket socket = socketList.get(pId);
 
-		// get option
-		dOut.writeByte(1);
-		dOut.flush();
+		String value;
+		synchronized(socket){
+			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
-		// key
-		dOut.writeUTF(key);
-		dOut.flush();
+			// get option
+			dOut.writeByte(1);
+			dOut.flush();
 
-		DataInputStream dIn = new DataInputStream(socket.getInputStream());
-		String value = dIn.readUTF();
+			// key
+			dOut.writeUTF(key);
+			dOut.flush();
 
-		socket.close();
+			DataInputStream dIn = new DataInputStream(socket.getInputStream());
+			value = dIn.readUTF();
+		}
 
 		return value;
 	}
 
 	// delete
-	public static Boolean delete(String key, int pId) throws Exception {
+	public Boolean delete(String key, int pId) throws Exception {
 		if (key.length() > 24)
 			return false;
 
-		String[] peerAddress = peerList.get(pId).split(":");
-		Socket socket = new Socket(peerAddress[0],
-				Integer.parseInt(peerAddress[1]));
-		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		Socket socket = socketList.get(pId);
+		boolean ack;
+		synchronized(socket){
+			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
-		// put option
-		dOut.writeByte(2);
-		dOut.flush();
+			// put option
+			dOut.writeByte(2);
+			dOut.flush();
 
-		// key, value
-		dOut.writeUTF(key);
-		dOut.flush();
+			// key
+			dOut.writeUTF(key);
+			dOut.flush();
 
-		DataInputStream dIn = new DataInputStream(socket.getInputStream());
-		boolean ack = dIn.readBoolean();
-
-		socket.close();
+			DataInputStream dIn = new DataInputStream(socket.getInputStream());
+			ack = dIn.readBoolean();
+		}
 
 		return ack;
 	}
@@ -183,16 +192,6 @@ public class Client extends Thread {
 		scanner.close();
 	}
 
-	public Client(Peer peer){
-		this.peer = peer;
-
-		try {
-			peerList = DistributedHashtable.readConfigFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static void main(String[] args) throws IOException {
 		if(args.length < 4){
 			System.out.println("Usage: java -jar build/OpenBench.jar <PeerId> <Address> <Port> <Folder>");
@@ -233,7 +232,7 @@ public class Client extends Thread {
 		}
 		ArrayList<String> fileNames = Util.listFilesForFolder(folder);
 		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
-		
+
 		Client c = new Client(peer);
 		c.userInterface();
 	}
