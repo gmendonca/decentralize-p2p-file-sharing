@@ -1,3 +1,12 @@
 {
-	"peers":["localhost:13000","localhost:13001","localhost:13002","localhost:13003","localhost:13004","localhost:13005","localhost:13006","localhost:13007"]
+	"peers":[
+		"localhost:13000:peer0",
+		"localhost:13001:peer1",
+		"localhost:13002:peer2",
+		"localhost:13003:peer3",
+		"localhost:13004:peer4",
+		"localhost:13005:peer5",
+		"localhost:13006:peer6",
+		"localhost:13007:peer7"
+	]
 }

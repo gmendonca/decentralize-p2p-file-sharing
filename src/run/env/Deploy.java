@@ -1,12 +1,14 @@
 package run.env;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
 import node.Peer;
-import node.server.Server;
+import node.server.IndexingServer;
 import util.DistributedHashtable;
+import util.Util;
 
 public class Deploy {
 	
@@ -22,20 +24,26 @@ public class Deploy {
 		
 		int id;
 		String[] peerAddress;
-		String address;
+		String address, dir;
 		int port;
+		ArrayList<String> fileNames;
+		File folder;
 		
 		for (id = 0; id < peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
 			address =  peerAddress[0];
 			port = Integer.parseInt(peerAddress[1]);
+			dir = peerAddress[2];
 			
-			Peer peer = new Peer(id, address, port);
+			folder = new File(dir);
+
+	    	fileNames = Util.listFilesForFolder(folder);
+			Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
 
 			ServerSocket serverSocket = new ServerSocket(port);
 
 			// start server
-			Server server = new Server(serverSocket, peer);
+			IndexingServer server = new IndexingServer(serverSocket, peer);
 			server.start();
 
 		}
