@@ -11,13 +11,14 @@ import java.util.Scanner;
 
 import node.Peer;
 import node.server.Assign;
-import node.server.Server;
+import node.server.IndexingServer;
 import util.DistributedHashtable;
 import util.Util;
 
 public class Client extends Thread {
 
 	private static ArrayList<String> peerList;
+	public static int numPeers;
 
 	// put
 	public static Boolean put(String key, String value, int pId)
@@ -110,6 +111,8 @@ public class Client extends Thread {
 		
 		peerList = DistributedHashtable.readConfigFile();
 
+		numPeers = peerList.size();
+
 		int id = 0;
 		try {
 			id = Integer.parseInt(args[0]);
@@ -146,7 +149,7 @@ public class Client extends Thread {
 		ServerSocket serverSocket = new ServerSocket(port);
 
 		// start server
-		Server server = new Server(serverSocket, peer);
+		IndexingServer server = new IndexingServer(serverSocket, peer);
 		server.start();
 
 		// start assign

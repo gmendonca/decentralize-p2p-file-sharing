@@ -6,12 +6,12 @@ import java.net.Socket;
 
 import node.Peer;
 
-public class Server extends Thread {
+public class IndexingServer extends Thread {
 
 	private ServerSocket serverSocket;
 	private Peer peer;
 
-	public Server(ServerSocket serverSocket, Peer peer) {
+	public IndexingServer(ServerSocket serverSocket, Peer peer) {
 		this.serverSocket = serverSocket;
 		this.peer = peer;
 	}
