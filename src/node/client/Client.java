@@ -1,4 +1,4 @@
-package client;
+package node.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import node.Peer;
-import server.Assign;
-import server.Server;
+import node.server.Assign;
+import node.server.Server;
 import util.DistributedHashtable;
 import util.Util;
 
