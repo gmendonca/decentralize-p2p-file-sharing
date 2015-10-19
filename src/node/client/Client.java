@@ -2,6 +2,7 @@ package node.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 
 import node.Peer;
 import util.DistributedHashtable;
+import util.Util;
 
 public class Client extends Thread {
 
@@ -96,11 +98,14 @@ public class Client extends Thread {
 
 		return ack;
 	}
-	
+
 	public void userInterface(){
 		int option, pId;
 		String key = null, value = null;
 		Boolean result = false;
+
+		System.out.println("Runnning as Peer " + peer.getPeerId());
+
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			System.out.println("\n\nSelect the option:");
@@ -118,14 +123,14 @@ public class Client extends Thread {
 						result = registry(key, value, pId);
 					} catch (Exception e) {
 						System.out
-								.println("Couldn't put the key-value pair in the system.");
+						.println("Couldn't put the key-value pair in the system.");
 					}
 
 					System.out
-							.println(result ? "Key " + key
-									+ " inserted at Peer " + pId + "("
-									+ peerList.get(pId) + ")."
-									: "Something went wrong and it couldn'd insert the key-value pair.");
+					.println(result ? "Key " + key
+							+ " inserted at Peer " + pId + "("
+							+ peerList.get(pId) + ")."
+							: "Something went wrong and it couldn'd insert the key-value pair.");
 
 				} else if (option == 2) {
 
@@ -138,7 +143,7 @@ public class Client extends Thread {
 						value = get(key, pId);
 					} catch (Exception e) {
 						System.out
-								.println("Something went wrong and it couldn'd find the value.");
+						.println("Something went wrong and it couldn'd find the value.");
 						continue;
 					}
 
@@ -158,7 +163,7 @@ public class Client extends Thread {
 						result = delete(key, pId);
 					} catch (Exception e) {
 						System.out
-								.println("Something went wrong and it couldn'd delete the value.");
+						.println("Something went wrong and it couldn'd delete the value.");
 						continue;
 					}
 
@@ -177,16 +182,60 @@ public class Client extends Thread {
 		}
 		scanner.close();
 	}
-	
+
 	public Client(Peer peer){
 		this.peer = peer;
-		
-		System.out.println("Runnning as Peer " + peer.getPeerId());
+
 		try {
 			peerList = DistributedHashtable.readConfigFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		if(args.length < 4){
+			System.out.println("Usage: java -jar build/OpenBench.jar <PeerId> <Address> <Port> <Folder>");
+			return;
+		}
+
+		peerList = DistributedHashtable.readConfigFile();
+
+		int id = 0;
+		try {
+			id = Integer.parseInt(args[0]);
+		} catch (Exception e) {
+			System.out.println("Put a valid Id");
+			return;
+		}
+
+		if(id > peerList.size()){
+			System.out.println("Peer Id shouldn't be greater than the number provided in the config file!");
+			return;
+		}
+
+		String address = args[1];
+
+		int port = 0;
+		try {
+			port = Integer.parseInt(args[2]);
+		} catch (Exception e) {
+			System.out.println("Put a valid port number");
+			return;
+		}
+
+		String dir = args[3];
+		File folder = new File(dir);
+
+		if(!folder.isDirectory()){
+			System.out.println("Put a valid directory name");
+			return;
+		}
+		ArrayList<String> fileNames = Util.listFilesForFolder(folder);
+		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
+		
+		Client c = new Client(peer);
+		c.userInterface();
 	}
 
 }
