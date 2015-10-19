@@ -20,13 +20,10 @@ public class Peer {
 
 	private Hashtable<String, String> hashtable;
 
-	public Peer(int peerId, String address, int port, String directory, ArrayList<String> fileNames, int numFiles) throws IOException {
+	public Peer(int peerId, String address, int port) throws IOException {
 		this.peerId = peerId;
 		this.address = address;
 		this.port = port;
-		this.directory = directory;
-		this.fileNames = fileNames;
-		this.numFiles = numFiles;
 
 		peerQueue = new PeerQueue<Socket>();
 		hashtable = new Hashtable<String, String>();

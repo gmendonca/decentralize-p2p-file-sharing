@@ -2,7 +2,6 @@ package node.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -10,14 +9,13 @@ import java.util.Scanner;
 
 import node.Peer;
 import util.DistributedHashtable;
-import util.Util;
 
 public class Client extends Thread {
 
 	private Peer peer;
 	private static ArrayList<String> peerList;
 	private ArrayList<Socket> socketList;
-	
+
 	public Client(Peer peer, ArrayList<Socket> socketList){
 		this.peer = peer;
 
@@ -118,7 +116,7 @@ public class Client extends Thread {
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
 			System.out.println("\n\nSelect the option:");
-			System.out.println("\t1 - Put");
+			System.out.println("\t1 - Registry");
 			System.out.println("\t2 - Get");
 			System.out.println("\t3 - Del");
 
@@ -194,7 +192,7 @@ public class Client extends Thread {
 
 	public static void main(String[] args) throws IOException {
 		if(args.length < 4){
-			System.out.println("Usage: java -jar build/OpenBench.jar <PeerId> <Address> <Port> <Folder>");
+			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port>");
 			return;
 		}
 
@@ -223,17 +221,36 @@ public class Client extends Thread {
 			return;
 		}
 
-		String dir = args[3];
-		File folder = new File(dir);
+		
+		Peer peer = new Peer(id, address, port);
+		
+		String[] peerAddress;
+		
+		ArrayList<Socket> socketList = new ArrayList<Socket>();
+		
+		// checking if all are open
+		for (id = 0; id < peerList.size(); id++) {
+			peerAddress = peerList.get(id).split(":");
+			address =  peerAddress[0];
+			port = Integer.parseInt(peerAddress[1]);
 
-		if(!folder.isDirectory()){
-			System.out.println("Put a valid directory name");
-			return;
+			try {
+				System.out.println("Testing connection to server " + address + ":"
+						+ port);
+				Socket s = new Socket(address, port);
+				socketList.add(s);
+				System.out.println("Server " + address + ":"
+						+ port + " is running.");
+			} catch (Exception e) {
+				// System.out.println("Not connected to server " + address + ":"
+				// + port);
+				// System.out.println("Trying again");
+				id--;
+				port--;
+			}
 		}
-		ArrayList<String> fileNames = Util.listFilesForFolder(folder);
-		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
 
-		Client c = new Client(peer);
+		Client c = new Client(peer, socketList);
 		c.userInterface();
 	}
 
