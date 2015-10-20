@@ -21,14 +21,42 @@ public class Client extends Thread {
 	private static ArrayList<String> peerList;
 	private ArrayList<Socket> socketList;
 
-	public Client(Peer peer, ArrayList<Socket> socketList){
+	public Client(Peer peer){
 		this.peer = peer;
+	}
 
+	//getters
+	public Peer getPeer(){
+		return this.peer;
+	}
+
+	public ArrayList<String> getPeerList(){
+		return peerList;
+	}
+
+	public ArrayList<Socket> getSocketList(){
+		return this.socketList;
+	}
+
+	//setters
+	public void setPeer(Peer peer){
+		this.peer = peer;
+	}
+
+	public void setPeerlist(){
 		try {
 			peerList = DistributedHashtable.readConfigFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void setPeerList(ArrayList<String> peerList){
+		peerList = peerList;
+	}
+
+	public void setSocketList(ArrayList<Socket> socketList){
+		this.socketList = socketList;
 	}
 
 	// put
@@ -65,7 +93,7 @@ public class Client extends Thread {
 
 	// get
 	public ArrayList<String> search(String fileName) throws IOException {
-		
+
 		int pId = DistributedHashtable.hash(fileName, peerList.size());
 		Socket socket = socketList.get(pId);
 
@@ -213,12 +241,13 @@ public class Client extends Thread {
 	}
 
 	public static void main(String[] args) throws IOException {
+
+		peerList = DistributedHashtable.readConfigFile();
+
 		if(args.length < 4){
 			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port>");
 			return;
 		}
-
-		peerList = DistributedHashtable.readConfigFile();
 
 		int id = 0;
 		try {
@@ -258,6 +287,12 @@ public class Client extends Thread {
 
 		ArrayList<Socket> socketList = new ArrayList<Socket>();
 
+		Client c = new Client(peer);
+		if(c.startServer(port))
+			System.out.println("Server running.");
+		else
+			System.out.println("It wasn't possible to start the Server.");
+
 		// checking if all are open
 		for (id = 0; id < peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
@@ -279,12 +314,8 @@ public class Client extends Thread {
 				port--;
 			}
 		}
-
-		Client c = new Client(peer, socketList);
-		if(c.startServer(port))
-			c.userInterface();
-		else
-			System.out.println("It wasn't possible to start the Server.");
+		
+		c.userInterface();
 	}
 
 }
