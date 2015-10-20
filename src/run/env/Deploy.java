@@ -27,15 +27,16 @@ public class Deploy {
 
 		int id;
 		String[] peerAddress;
-		String address;
+		String address, dir;
 		int port;
 
 		for (id = 0; id < peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
 			address =  peerAddress[0];
 			port = Integer.parseInt(peerAddress[1]);
+			dir = peerAddress[2];
 			
-			Peer peer = new Peer(id, address, port);
+			Peer peer = new Peer(id, address, port,dir);
 			//peer.setDirectory(peerAddress[2]);
 			peerClassList.add(peer);
 

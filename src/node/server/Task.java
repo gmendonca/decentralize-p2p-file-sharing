@@ -26,16 +26,17 @@ public class Task extends Thread {
 
 				byte option = dIn.readByte();
 				//System.out.println(option);
-				String key, value;
+				String fileName, peer, key, value;
 
 				switch (option) {
 				case 0:
 					//registry
-					key = dIn.readUTF();
+					fileName = dIn.readUTF();
 					//System.out.println(key);
-					value = dIn.readUTF();
+					peer = dIn.readUTF();
 					dOut = new DataOutputStream(socket.getOutputStream());
 					//dOut.writeBoolean(peer.put(key, value));
+					dOut.writeBoolean(indexingServer.registry(fileName, peer));
 					dOut.flush();
 					break;
 				case 1:

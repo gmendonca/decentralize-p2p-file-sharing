@@ -48,7 +48,14 @@ public class IndexingServer extends Thread {
 		return peerQueue.poll();
 	}
 
-	public boolean registry(){
+	public boolean registry(String fileName, String peer) throws Exception{
+		String [] peerItems = peer.split(":");
+		if(index.containsKey(fileName)){
+			index.get(fileName).add(new Peer(Integer.parseInt(peerItems[0]), peerItems[1], Integer.parseInt(peerItems[2]), peerItems[3]));
+		}else {
+			index.put(fileName, new ArrayList<Peer>());
+			index.get(fileName).add(new Peer(Integer.parseInt(peerItems[0]), peerItems[1], Integer.parseInt(peerItems[2]), peerItems[3]));
+		}
 		return false;
 
 	}

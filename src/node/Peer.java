@@ -17,8 +17,8 @@ public class Peer {
 	private int numFiles;
 
 	private Hashtable<String, String> hashtable;
-
-	public Peer(int peerId, String address, int port) throws IOException {
+	
+	public Peer(int peerId, String address, int port, String directory) throws IOException {
 		this.peerId = peerId;
 		this.address = address;
 		this.port = port;
