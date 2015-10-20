@@ -24,12 +24,12 @@ public class IndexingServer extends Thread {
 
 		peerQueue = new PeerQueue<Socket>();
 	}
-	
+
 	//setters
 	public void setPeerQueue(PeerQueue<Socket> peerQueue) {
 		this.peerQueue = peerQueue;
 	}
-	
+
 	//getters
 	public PeerQueue<Socket> getPeerQueue() {
 		return peerQueue;
@@ -57,7 +57,13 @@ public class IndexingServer extends Thread {
 			index.get(fileName).add(new Peer(Integer.parseInt(peerItems[0]), peerItems[1], Integer.parseInt(peerItems[2]), peerItems[3]));
 		}
 		return false;
+	}
 
+	public ArrayList<Peer> lookup(String fileName){
+		if(index.containsKey(fileName)){
+			return index.get(fileName);
+		}
+		return new ArrayList<Peer>();
 	}
 
 	public void run() {

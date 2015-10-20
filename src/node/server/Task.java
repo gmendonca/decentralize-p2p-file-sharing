@@ -3,6 +3,7 @@ package node.server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import node.Peer;
 
@@ -27,6 +28,7 @@ public class Task extends Thread {
 				byte option = dIn.readByte();
 				//System.out.println(option);
 				String fileName, peer, key, value;
+				ArrayList<Peer> peerList;
 
 				switch (option) {
 				case 0:
@@ -40,12 +42,18 @@ public class Task extends Thread {
 					dOut.flush();
 					break;
 				case 1:
-					// get
-					key = dIn.readUTF();
+					// lookup
+					fileName = dIn.readUTF();
 					//value = peer.get(key);
+					peerList = indexingServer.lookup(fileName);
 					dOut = new DataOutputStream(socket.getOutputStream());
-					//dOut.writeUTF((value != null) ? value : "");
+					dOut.writeInt(peerList.size());
 					dOut.flush();
+					if(peerList.size() != 0){
+						for(Peer p : peerList)
+							dOut.writeUTF(p.toString());
+						dOut.flush();
+					}
 					break;
 				case 2:
 					// delete

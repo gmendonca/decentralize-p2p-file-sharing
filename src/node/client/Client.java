@@ -64,29 +64,32 @@ public class Client extends Thread {
 	}
 
 	// get
-	public String get(String key, int pId) throws IOException {
-		if (key.length() > 24)
-			return null;
-
+	public ArrayList<String> search(String fileName) throws IOException {
+		
+		int pId = DistributedHashtable.hash(fileName, peerList.size());
 		Socket socket = socketList.get(pId);
 
-		String value;
+		ArrayList<String> resultList = new ArrayList<String>();
+		int numFiles;
 		synchronized(socket){
 			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
-			// get option
+			// lookup option
 			dOut.writeByte(1);
 			dOut.flush();
 
 			// key
-			dOut.writeUTF(key);
+			dOut.writeUTF(fileName);
 			dOut.flush();
 
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
-			value = dIn.readUTF();
+			numFiles = dIn.readInt();
+			for(int i = 0; i < numFiles; i++){
+				resultList.add(dIn.readUTF());
+			}
 		}
 
-		return value;
+		return resultList;
 	}
 
 	// delete
@@ -135,8 +138,9 @@ public class Client extends Thread {
 
 	public void userInterface(){
 		int option, pId;
-		String key = null, value = null;
+		String key = null;
 		Boolean result = false;
+		ArrayList<String> value;
 
 		System.out.println("Runnning as Peer " + peer.getPeerId());
 
@@ -166,20 +170,16 @@ public class Client extends Thread {
 					System.out.print("key: ");
 					key = scanner.next();
 
-					pId = DistributedHashtable.hash(key, peerList.size());
-
 					try {
-						value = get(key, pId);
+						value = search(key);
 					} catch (Exception e) {
 						System.out
 						.println("Something went wrong and it couldn'd find the value.");
 						continue;
 					}
-
-					System.out.println(!value.equals("") ? "Key " + key
-							+ " is at Peer " + pId + "(" + peerList.get(pId)
-							+ ") and has value " + value + "."
-							: "Value not found.");
+					for(String s : value){
+						System.out.println(s);
+					}
 
 				} else if (option == 3) {
 
