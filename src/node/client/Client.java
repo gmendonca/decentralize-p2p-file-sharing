@@ -51,8 +51,8 @@ public class Client extends Thread {
 		}
 	}
 
-	public void setPeerList(ArrayList<String> peerList){
-		peerList = peerList;
+	public void setPeerList(ArrayList<String> peerList2){
+		peerList = peerList2;
 	}
 
 	public void setSocketList(ArrayList<Socket> socketList){
@@ -99,23 +99,23 @@ public class Client extends Thread {
 
 		ArrayList<String> resultList = new ArrayList<String>();
 		int numFiles;
-		synchronized(socket){
-			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		//synchronized(socket){
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
-			// lookup option
-			dOut.writeByte(1);
-			dOut.flush();
+		// lookup option
+		dOut.writeByte(1);
+		dOut.flush();
 
-			// key
-			dOut.writeUTF(fileName);
-			dOut.flush();
+		// key
+		dOut.writeUTF(fileName);
+		dOut.flush();
 
-			DataInputStream dIn = new DataInputStream(socket.getInputStream());
-			numFiles = dIn.readInt();
-			for(int i = 0; i < numFiles; i++){
-				resultList.add(dIn.readUTF());
-			}
+		DataInputStream dIn = new DataInputStream(socket.getInputStream());
+		numFiles = dIn.readInt();
+		for(int i = 0; i < numFiles; i++){
+			resultList.add(dIn.readUTF());
 		}
+		//}
 
 		return resultList;
 	}
@@ -314,7 +314,7 @@ public class Client extends Thread {
 				port--;
 			}
 		}
-		
+		c.setSocketList(socketList);
 		c.userInterface();
 	}
 
