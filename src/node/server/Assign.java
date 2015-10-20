@@ -9,17 +9,17 @@ import node.Peer;
 public class Assign extends Thread {
 
 	private int numThreads = 4;
-	private Peer peer;
+	private IndexingServer indexingServer;
 
-	public Assign(Peer peer) {
-		this.peer = peer;
+	public Assign(IndexingServer indexingServer) {
+		this.indexingServer = indexingServer;
 	}
 
 	public void run() {
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
 		while (true) {
-			if (peer.peekPeerQueue() == null) {
+			if (indexingServer.peekPeerQueue() == null) {
 				try {
 					Thread.sleep(1);
 				} catch (InterruptedException e) {
@@ -27,9 +27,9 @@ public class Assign extends Thread {
 				}
 				continue;
 			}
-			synchronized (peer.getPeerQueue()) {
-				Socket socket = peer.pollPeerQueue();
-				Task t = new Task(socket, peer);
+			synchronized (indexingServer.getPeerQueue()) {
+				Socket socket = indexingServer.pollPeerQueue();
+				Task t = new Task(socket, indexingServer);
 				executor.execute(t);
 			}
 		}

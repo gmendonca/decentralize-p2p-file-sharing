@@ -16,8 +16,6 @@ public class Peer {
 	private ArrayList<String> fileNames;
 	private int numFiles;
 
-	private PeerQueue<Socket> peerQueue;
-
 	private Hashtable<String, String> hashtable;
 
 	public Peer(int peerId, String address, int port) throws IOException {
@@ -25,7 +23,7 @@ public class Peer {
 		this.address = address;
 		this.port = port;
 
-		peerQueue = new PeerQueue<Socket>();
+		
 		hashtable = new Hashtable<String, String>();
 	}
 
@@ -36,7 +34,6 @@ public class Peer {
 		this.address = address;
 		this.port = port;
 
-		peerQueue = new PeerQueue<Socket>();
 		hashtable = new Hashtable<String, String>();
 	}	
 
@@ -51,10 +48,6 @@ public class Peer {
 
 	public int getPort() {
 		return port;
-	}
-
-	public PeerQueue<Socket> getPeerQueue() {
-		return peerQueue;
 	}
 
 	public Hashtable<String, String> getHashtable() {
@@ -86,10 +79,6 @@ public class Peer {
 		this.port = port;
 	}
 
-	public void setPeerQueue(PeerQueue<Socket> peerQueue) {
-		this.peerQueue = peerQueue;
-	}
-
 	public void setHashtable(Hashtable<String, String> hashtable) {
 		this.hashtable = hashtable;
 	}
@@ -110,18 +99,7 @@ public class Peer {
 		this.directory = directory;
 	}
 
-	// Queue methods
-	public void addToPeerQueue(Socket sock) {
-		peerQueue.add(sock);
-	}
-
-	public Socket peekPeerQueue() {
-		return peerQueue.peek();
-	}
-
-	public Socket pollPeerQueue() {
-		return peerQueue.poll();
-	}
+	
 
 	//Override
 	public String toString(){

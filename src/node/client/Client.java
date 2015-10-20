@@ -119,11 +119,11 @@ public class Client extends Thread {
 		try {
 			serverSocket = new ServerSocket(port);
 			// start server
-			IndexingServer server = new IndexingServer(serverSocket, peer);
+			IndexingServer server = new IndexingServer(serverSocket);
 			server.start();
 
 			// start assign
-			Assign assign = new Assign(peer);
+			Assign assign = new Assign(server);
 			assign.start();
 		} catch (IOException e) {
 			//e.printStackTrace();

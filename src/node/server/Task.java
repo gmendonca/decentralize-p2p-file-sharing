@@ -9,11 +9,11 @@ import node.Peer;
 public class Task extends Thread {
 
 	private Socket socket;
-	private Peer peer;
+	private IndexingServer indexingServer;
 
-	public Task(Socket socket, Peer peer) {
+	public Task(Socket socket, IndexingServer indexingServer) {
 		this.socket = socket;
-		this.peer = peer;
+		this.indexingServer = indexingServer;
 	}
 
 	public void run() {
@@ -35,22 +35,22 @@ public class Task extends Thread {
 					//System.out.println(key);
 					value = dIn.readUTF();
 					dOut = new DataOutputStream(socket.getOutputStream());
-					dOut.writeBoolean(peer.put(key, value));
+					//dOut.writeBoolean(peer.put(key, value));
 					dOut.flush();
 					break;
 				case 1:
 					// get
 					key = dIn.readUTF();
-					value = peer.get(key);
+					//value = peer.get(key);
 					dOut = new DataOutputStream(socket.getOutputStream());
-					dOut.writeUTF((value != null) ? value : "");
+					//dOut.writeUTF((value != null) ? value : "");
 					dOut.flush();
 					break;
 				case 2:
 					// delete
 					key = dIn.readUTF();
 					dOut = new DataOutputStream(socket.getOutputStream());
-					dOut.writeBoolean(peer.delete(key));
+					//dOut.writeBoolean(peer.delete(key));
 					dOut.flush();
 					break;
 				default:

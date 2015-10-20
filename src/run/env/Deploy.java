@@ -42,11 +42,11 @@ public class Deploy {
 			ServerSocket serverSocket = new ServerSocket(port);
 
 			// start server
-			IndexingServer server = new IndexingServer(serverSocket, peer);
+			IndexingServer server = new IndexingServer(serverSocket);
 			server.start();
 
 			//start assign server
-			Assign assign = new Assign(peer);
+			Assign assign = new Assign(server);
 			assign.start();
 		}
 
