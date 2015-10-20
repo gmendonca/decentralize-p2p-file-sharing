@@ -2,6 +2,7 @@ package node.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 
 import node.Peer;
 import util.DistributedHashtable;
+import util.Util;
 
 public class Client extends Thread {
 
@@ -220,9 +222,17 @@ public class Client extends Thread {
 			System.out.println("Put a valid port number");
 			return;
 		}
-
 		
-		Peer peer = new Peer(id, address, port);
+		String dir = args[3];
+    	File folder = new File(dir);
+    	
+    	if(!folder.isDirectory()){
+			System.out.println("Put a valid directory name");
+			return;
+    	}
+		
+    	ArrayList<String> fileNames = Util.listFilesForFolder(folder);
+		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
 		
 		String[] peerAddress;
 		

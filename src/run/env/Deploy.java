@@ -36,6 +36,7 @@ public class Deploy {
 			port = Integer.parseInt(peerAddress[1]);
 			
 			Peer peer = new Peer(id, address, port);
+			//peer.setDirectory(peerAddress[2]);
 			peerClassList.add(peer);
 
 			ServerSocket serverSocket = new ServerSocket(port);
@@ -71,8 +72,8 @@ public class Deploy {
 			}
 		}
 
-		Client c = new Client(peerClassList.get(0), socketList);
-		c.userInterface();
+		//Client c = new Client(peerClassList.get(0), socketList);
+		//c.userInterface();
 	}
 
 

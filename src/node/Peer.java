@@ -28,7 +28,18 @@ public class Peer {
 		peerQueue = new PeerQueue<Socket>();
 		hashtable = new Hashtable<String, String>();
 	}
-
+	
+	public Peer(int peerId, String address, int port, String directory, ArrayList<String> fileNames, int numFiles) throws IOException{
+		this.directory = directory;
+		this.fileNames = fileNames;
+		this.numFiles = numFiles;
+		this.address = address;
+		this.port = port;
+		
+		peerQueue = new PeerQueue<Socket>();
+		hashtable = new Hashtable<String, String>();
+	}	
+	
 	// getters
 	public int getPeerId() {
 		return peerId;
