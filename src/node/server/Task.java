@@ -30,6 +30,7 @@ public class Task extends Thread {
 
 				switch (option) {
 				case 0:
+					//registry
 					key = dIn.readUTF();
 					//System.out.println(key);
 					value = dIn.readUTF();

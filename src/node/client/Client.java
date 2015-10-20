@@ -4,11 +4,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import node.server.Assign;
 import node.Peer;
+import node.server.IndexingServer;
 import util.DistributedHashtable;
 import util.Util;
 
@@ -29,29 +32,32 @@ public class Client extends Thread {
 	}
 
 	// put
-	public Boolean registry(String key, String value, int pId)
+	public Boolean registry()
 			throws Exception {
-		if (key.length() > 24)
-			return false;
-		if (value.length() > 1000)
-			return false;
 
-		Socket socket = socketList.get(pId);
-		boolean ack;
-		synchronized(socket){
+		int pId;
+		Socket socket;
+		boolean ack = false;
+		for(String fileName : peer.getFileNames()){
+			pId = DistributedHashtable.hash(fileName, peerList.size());
+			socket = socketList.get(pId);
+
+			//synchronized(socket){
 			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 			// put option
 			dOut.writeByte(0);
 			dOut.flush();
 
-			// key, value
-			dOut.writeUTF(key);
+			// fileName, peer
+			dOut.writeUTF(fileName);
 			dOut.flush();
-			dOut.writeUTF(value);
+			dOut.writeUTF(peer.toString());
 			dOut.flush();
 
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			ack = dIn.readBoolean();
+			if(ack == false) break;
+			//}
 		}
 
 		return ack;
@@ -108,6 +114,25 @@ public class Client extends Thread {
 		return ack;
 	}
 
+	public boolean startServer(int port){
+		ServerSocket serverSocket;
+		try {
+			serverSocket = new ServerSocket(port);
+			// start server
+			IndexingServer server = new IndexingServer(serverSocket, peer);
+			server.start();
+
+			// start assign
+			Assign assign = new Assign(peer);
+			assign.start();
+		} catch (IOException e) {
+			//e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
 	public void userInterface(){
 		int option, pId;
 		String key = null, value = null;
@@ -125,21 +150,16 @@ public class Client extends Thread {
 			try {
 				option = scanner.nextInt();
 				if (option == 1) {
-
-					pId = DistributedHashtable.hash(key, peerList.size());
-					System.out.println(pId);
 					try {
-						result = registry(key, value, pId);
+						result = registry();
 					} catch (Exception e) {
 						System.out
-						.println("Couldn't put the key-value pair in the system.");
+						.println("Couldn't registry in the system.");
 					}
 
 					System.out
-					.println(result ? "Key " + key
-							+ " inserted at Peer " + pId + "("
-							+ peerList.get(pId) + ")."
-							: "Something went wrong and it couldn'd insert the key-value pair.");
+					.println(result ? "Registered!"
+							: "Not registered.");
 
 				} else if (option == 2) {
 
@@ -222,22 +242,22 @@ public class Client extends Thread {
 			System.out.println("Put a valid port number");
 			return;
 		}
-		
+
 		String dir = args[3];
-    	File folder = new File(dir);
-    	
-    	if(!folder.isDirectory()){
+		File folder = new File(dir);
+
+		if(!folder.isDirectory()){
 			System.out.println("Put a valid directory name");
 			return;
-    	}
-		
-    	ArrayList<String> fileNames = Util.listFilesForFolder(folder);
+		}
+
+		ArrayList<String> fileNames = Util.listFilesForFolder(folder);
 		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
-		
+
 		String[] peerAddress;
-		
+
 		ArrayList<Socket> socketList = new ArrayList<Socket>();
-		
+
 		// checking if all are open
 		for (id = 0; id < peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
@@ -261,7 +281,10 @@ public class Client extends Thread {
 		}
 
 		Client c = new Client(peer, socketList);
-		c.userInterface();
+		if(c.startServer(port))
+			c.userInterface();
+		else
+			System.out.println("It wasn't possible to start the Server.");
 	}
 
 }
