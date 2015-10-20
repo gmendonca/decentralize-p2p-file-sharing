@@ -1,10 +1,8 @@
-package node.server;
+package index.server;
 
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import node.Peer;
 
 public class Assign extends Thread {
 

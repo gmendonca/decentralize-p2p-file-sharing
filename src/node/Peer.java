@@ -1,11 +1,8 @@
 package node;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
-
-import util.PeerQueue;
 
 public class Peer {
 
@@ -99,41 +96,15 @@ public class Peer {
 		this.directory = directory;
 	}
 
-	
-
 	//Override
 	public String toString(){
 		return peerId + ":" +address + ":" + port + ":" + directory;
-
+	}
+	
+	public boolean download(String fileName) {
+		return false;
 	}
 
-	// put
-	public Boolean put(String key, String value) throws Exception {
-		try {
-			hashtable.put(key, value);
-		} catch (Exception e) {
-			return false;
-		}
-		return true;
-	}
 
-	// get
-	public String get(String key) throws IOException {
-		return hashtable.get(key);
-	}
-
-	// delete
-	public Boolean delete(String key) {
-		if (!hashtable.containsKey(key))
-			return false;
-
-		try {
-			hashtable.remove(key);
-		} catch (Exception e) {
-			return false;
-		}
-
-		return true;
-	}
 
 }

@@ -1,5 +1,8 @@
 package node.client;
 
+import index.server.Assign;
+import index.server.IndexingServer;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -9,9 +12,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import node.server.Assign;
 import node.Peer;
-import node.server.IndexingServer;
 import util.DistributedHashtable;
 import util.Util;
 
@@ -245,7 +246,7 @@ public class Client extends Thread {
 		peerList = DistributedHashtable.readConfigFile();
 
 		if(args.length < 4){
-			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port>");
+			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port> <Folder>");
 			return;
 		}
 

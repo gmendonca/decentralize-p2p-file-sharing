@@ -1,5 +1,8 @@
 package run.env;
 
+import index.server.Assign;
+import index.server.IndexingServer;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,8 +10,6 @@ import java.util.ArrayList;
 
 import node.Peer;
 import node.client.Client;
-import node.server.Assign;
-import node.server.IndexingServer;
 import util.DistributedHashtable;
 
 public class Deploy {
