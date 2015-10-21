@@ -244,7 +244,7 @@ public class Client extends Thread {
 						continue;
 					}
 					for (int i = 1; i <= value.size(); i++) {
-						System.out.println("\t" + i + " - " + value.get(i));
+						System.out.println("\t" + i + " - " + value.get(i-1));
 					}
 
 				} else {
@@ -257,6 +257,7 @@ public class Client extends Thread {
 			}
 		}
 		scanner.close();
+		return;
 	}
 
 	public static void main(String[] args) throws IOException {

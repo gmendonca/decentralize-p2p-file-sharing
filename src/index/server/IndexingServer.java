@@ -77,6 +77,8 @@ public class IndexingServer extends Thread {
 	}
 
 	public void run() {
+		
+		System.out.println("\nRunning server at port " + serverSocket.getLocalPort() + "\n");
 
 		while (true) {
 			Socket socket = null;
