@@ -20,7 +20,7 @@ public class Deploy {
 	public static void main(String[] args) throws IOException {
 		// Creating servers
 
-		peerList = DistributedHashtable.readConfigFile();
+		peerList = DistributedHashtable.readConfigFile("peers");
 
 		ArrayList<Peer> peerClassList = new ArrayList<Peer>();
 		

@@ -2,5 +2,9 @@
 	"peers":[
 		"localhost:13000:peer0",
 		"localhost:13001:peer1"
+	],
+	"servers":[
+		"localhost:15000",
+		"localhost:15001"
 	]
 }

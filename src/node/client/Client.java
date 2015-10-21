@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import node.Peer;
+import node.server.Server;
 import util.DistributedHashtable;
 import util.Util;
 
@@ -46,7 +47,7 @@ public class Client extends Thread {
 
 	public void setPeerlist(){
 		try {
-			peerList = DistributedHashtable.readConfigFile();
+			peerList = DistributedHashtable.readConfigFile("peers");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -146,7 +147,7 @@ public class Client extends Thread {
 		return ack;
 	}
 
-	public boolean startServer(int port){
+	public boolean startIndexingServer(int port){
 		ServerSocket serverSocket;
 		try {
 			serverSocket = new ServerSocket(port);
@@ -243,7 +244,7 @@ public class Client extends Thread {
 
 	public static void main(String[] args) throws IOException {
 
-		peerList = DistributedHashtable.readConfigFile();
+		peerList = DistributedHashtable.readConfigFile("peers");
 
 		if(args.length < 4){
 			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port> <Folder>");
@@ -282,14 +283,34 @@ public class Client extends Thread {
 		}
 
 		ArrayList<String> fileNames = Util.listFilesForFolder(folder);
-		Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
+		final Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
+		
+		new Thread(){
+    		public void run(){
+    			try {
+					peer.server();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+    		}
+    	}.start();
+    	
+    	new Thread(){
+    		public void run(){
+    			try {
+					peer.assign();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+    		}
+    	}.start();
 
 		String[] peerAddress;
 
 		ArrayList<Socket> socketList = new ArrayList<Socket>();
 
 		Client c = new Client(peer);
-		if(c.startServer(port))
+		if(c.startIndexingServer(port))
 			System.out.println("Server running.");
 		else
 			System.out.println("It wasn't possible to start the Server.");

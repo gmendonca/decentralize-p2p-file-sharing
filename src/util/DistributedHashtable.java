@@ -11,7 +11,7 @@ import org.json.simple.parser.JSONParser;
 
 public class DistributedHashtable {
 
-	public static ArrayList<String> readConfigFile() throws IOException {
+	public static ArrayList<String> readConfigFile(String element) throws IOException {
 		// read from a JSON
 		JSONParser parser = new JSONParser();
 		ArrayList<String> peerList = new ArrayList<String>();
@@ -23,7 +23,7 @@ public class DistributedHashtable {
 			JSONObject jsonObject = (JSONObject) obj;
 
 			// loop array
-			JSONArray msg = (JSONArray) jsonObject.get("peers");
+			JSONArray msg = (JSONArray) jsonObject.get(element);
 			Iterator<?> iterator = msg.iterator();
 
 			while (iterator.hasNext()) {
