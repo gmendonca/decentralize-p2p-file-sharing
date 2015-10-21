@@ -17,7 +17,7 @@
         <mkdir dir="build/" />
 
         <jar destfile="build/Client.jar">
-          <fileset includes="node/*.class,node/server/*.class,node/client/*class,util/*.class" dir="bin/"/>
+          <fileset includes="node/*.class,node/server/*.class,node/client/*class,util/*.class,index/server/*" dir="bin/"/>
           <zipgroupfileset includes="*.jar" dir="lib/"/>
           <manifest>
             <attribute name="Main-Class" value="node.client.Client"/>
