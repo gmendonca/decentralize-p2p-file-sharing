@@ -324,10 +324,6 @@ public class Client extends Thread {
 		ArrayList<Socket> socketList = new ArrayList<Socket>();
 
 		Client c = new Client(peer);
-		if(c.startIndexingServer(port))
-			System.out.println("Server running.");
-		else
-			System.out.println("It wasn't possible to start the Server.");
 
 		// checking if all are open
 		for (id = 0; id < serverList.size(); id++) {

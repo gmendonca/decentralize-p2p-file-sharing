@@ -38,6 +38,7 @@ public class Peer {
 	}
 
 	public Peer(int peerId, String address, int port, String directory, ArrayList<String> fileNames, int numFiles) throws IOException{
+		this.peerId = peerId;
 		this.directory = directory;
 		this.fileNames = fileNames;
 		this.numFiles = numFiles;
