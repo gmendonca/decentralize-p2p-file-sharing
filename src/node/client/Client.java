@@ -140,6 +140,7 @@ public class Client extends Thread {
 	
 	public void download(String fileName, int peerId, String peer) throws Exception {
 		String [] peerAddress = peer.split(":");
+		//TODO: create a socket list for the peers too
 		Socket socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
     	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
     	dOut.writeUTF(fileName);
