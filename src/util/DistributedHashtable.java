@@ -44,8 +44,7 @@ public class DistributedHashtable {
 		int sum = 0;
 		for (int i = 0; i < key.length(); i++)
 			sum += key.charAt(i);
-		//System.out.println("filename: " + key + " " + sum + " " + sum
-				% numPeers);
+		//System.out.println("filename: " + key + " " + sum + " " + sum % numPeers);
 		return sum % numPeers;
 	}
 }
