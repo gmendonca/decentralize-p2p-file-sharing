@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import node.Peer;
-import node.server.Server;
 import util.DistributedHashtable;
 import util.Util;
 
@@ -21,6 +20,7 @@ public class Client extends Thread {
 
 	private Peer peer;
 	private static ArrayList<String> peerList;
+	private static ArrayList<String> serverList;
 	private ArrayList<Socket> socketList;
 
 	public Client(Peer peer){
@@ -56,6 +56,18 @@ public class Client extends Thread {
 	public void setPeerList(ArrayList<String> peerList2){
 		peerList = peerList2;
 	}
+	
+	public void setServerlist(){
+		try {
+			serverList = DistributedHashtable.readConfigFile("servers");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void setServerList(ArrayList<String> serverList2){
+		serverList = serverList2;
+	}
 
 	public void setSocketList(ArrayList<Socket> socketList){
 		this.socketList = socketList;
@@ -69,7 +81,7 @@ public class Client extends Thread {
 		Socket socket;
 		boolean ack = false;
 		for(String fileName : peer.getFileNames()){
-			pId = DistributedHashtable.hash(fileName, peerList.size());
+			pId = DistributedHashtable.hash(fileName, serverList.size());
 			socket = socketList.get(pId);
 
 			//synchronized(socket){
@@ -96,7 +108,7 @@ public class Client extends Thread {
 	// get
 	public ArrayList<String> search(String fileName) throws IOException {
 
-		int pId = DistributedHashtable.hash(fileName, peerList.size());
+		int pId = DistributedHashtable.hash(fileName, serverList.size());
 		Socket socket = socketList.get(pId);
 
 		ArrayList<String> resultList = new ArrayList<String>();
@@ -245,6 +257,8 @@ public class Client extends Thread {
 	public static void main(String[] args) throws IOException {
 
 		peerList = DistributedHashtable.readConfigFile("peers");
+		
+		serverList = DistributedHashtable.readConfigFile("servers");
 
 		if(args.length < 4){
 			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port> <Folder>");
@@ -316,8 +330,8 @@ public class Client extends Thread {
 			System.out.println("It wasn't possible to start the Server.");
 
 		// checking if all are open
-		for (id = 0; id < peerList.size(); id++) {
-			peerAddress = peerList.get(id).split(":");
+		for (id = 0; id < serverList.size(); id++) {
+			peerAddress = serverList.get(id).split(":");
 			address =  peerAddress[0];
 			port = Integer.parseInt(peerAddress[1]);
 
