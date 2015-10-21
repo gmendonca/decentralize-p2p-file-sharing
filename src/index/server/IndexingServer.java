@@ -25,12 +25,12 @@ public class IndexingServer extends Thread {
 		peerQueue = new PeerQueue<Socket>();
 	}
 
-	//setters
+	// setters
 	public void setPeerQueue(PeerQueue<Socket> peerQueue) {
 		this.peerQueue = peerQueue;
 	}
 
-	//getters
+	// getters
 	public PeerQueue<Socket> getPeerQueue() {
 		return peerQueue;
 	}
@@ -48,24 +48,29 @@ public class IndexingServer extends Thread {
 		return peerQueue.poll();
 	}
 
-	public boolean registry(String fileName, String peer) throws Exception{
-		String [] peerItems = peer.split(":");
-		try{
-			if(index.containsKey(fileName)){
-				index.get(fileName).add(new Peer(Integer.parseInt(peerItems[0]), peerItems[1], Integer.parseInt(peerItems[2]), peerItems[3]));
+	public boolean registry(String fileName, String peer) throws Exception {
+		System.out.println(fileName + " " + peer);
+		String[] peerItems = peer.split(":");
+		try {
+			if (index.containsKey(fileName)) {
+				index.get(fileName).add(
+						new Peer(Integer.parseInt(peerItems[0]), peerItems[1],
+								Integer.parseInt(peerItems[2]), peerItems[3]));
 				return true;
-			}else {
+			} else {
 				index.put(fileName, new ArrayList<Peer>());
-				index.get(fileName).add(new Peer(Integer.parseInt(peerItems[0]), peerItems[1], Integer.parseInt(peerItems[2]), peerItems[3]));
+				index.get(fileName).add(
+						new Peer(Integer.parseInt(peerItems[0]), peerItems[1],
+								Integer.parseInt(peerItems[2]), peerItems[3]));
 				return true;
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			return false;
 		}
 	}
 
-	public ArrayList<Peer> lookup(String fileName){
-		if(index.containsKey(fileName)){
+	public ArrayList<Peer> lookup(String fileName) {
+		if (index.containsKey(fileName)) {
 			return index.get(fileName);
 		}
 		return new ArrayList<Peer>();

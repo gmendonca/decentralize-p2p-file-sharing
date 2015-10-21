@@ -21,54 +21,44 @@ public class Task extends Thread {
 
 		try {
 
-			while(true){
-				DataInputStream dIn = new DataInputStream(socket.getInputStream());
+			while (true) {
+				DataInputStream dIn = new DataInputStream(
+						socket.getInputStream());
 				DataOutputStream dOut = null;
 
 				byte option = dIn.readByte();
-				//System.out.println(option);
-				String fileName, peer, key, value;
+				// System.out.println(option);
+				String fileName, peer;
 				ArrayList<Peer> peerList;
 
 				switch (option) {
 				case 0:
-					//registry
+					// registry
 					fileName = dIn.readUTF();
-					//System.out.println(key);
+					// System.out.println(key);
 					peer = dIn.readUTF();
 					dOut = new DataOutputStream(socket.getOutputStream());
-					//dOut.writeBoolean(peer.put(key, value));
 					dOut.writeBoolean(indexingServer.registry(fileName, peer));
 					dOut.flush();
 					break;
 				case 1:
 					// lookup
 					fileName = dIn.readUTF();
-					//value = peer.get(key);
 					peerList = indexingServer.lookup(fileName);
 					dOut = new DataOutputStream(socket.getOutputStream());
 					dOut.writeInt(peerList.size());
 					dOut.flush();
-					if(peerList.size() != 0){
-						for(Peer p : peerList)
+					if (peerList.size() != 0) {
+						for (Peer p : peerList)
 							dOut.writeUTF(p.toString());
 						dOut.flush();
 					}
 					break;
-				case 2:
-					// delete
-					key = dIn.readUTF();
-					dOut = new DataOutputStream(socket.getOutputStream());
-					//dOut.writeBoolean(peer.delete(key));
-					dOut.flush();
-					break;
-				default:
-					System.out.println("Not an option");
 				}
 			}
 		} catch (Exception e) {
-			//System.out.println("Nothing happened");
-			//e.printStackTrace();
+			// System.out.println("Nothing happened");
+			// e.printStackTrace();
 
 		}
 

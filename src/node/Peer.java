@@ -22,22 +22,23 @@ public class Peer {
 	private int numFiles;
 	private int numThreads = 4;
 	public ServerSocket serverSocket;
-	
+
 	private PeerQueue<Connection> peerQueue;
 
 	private Hashtable<String, String> hashtable;
-	
-	public Peer(int peerId, String address, int port, String directory) throws IOException {
+
+	public Peer(int peerId, String address, int port, String directory)
+			throws IOException {
 		this.peerId = peerId;
 		this.address = address;
 		this.port = port;
 
-		
 		hashtable = new Hashtable<String, String>();
 		peerQueue = new PeerQueue<Connection>();
 	}
 
-	public Peer(int peerId, String address, int port, String directory, ArrayList<String> fileNames, int numFiles) throws IOException{
+	public Peer(int peerId, String address, int port, String directory,
+			ArrayList<String> fileNames, int numFiles) throws IOException {
 		this.peerId = peerId;
 		this.directory = directory;
 		this.fileNames = fileNames;
@@ -47,7 +48,7 @@ public class Peer {
 
 		hashtable = new Hashtable<String, String>();
 		peerQueue = new PeerQueue<Connection>();
-	}	
+	}
 
 	// getters
 	public int getPeerId() {
@@ -66,15 +67,15 @@ public class Peer {
 		return hashtable;
 	}
 
-	public int getNumFiles(){
+	public int getNumFiles() {
 		return numFiles;
 	}
 
-	public ArrayList<String> getFileNames(){
+	public ArrayList<String> getFileNames() {
 		return fileNames;
 	}
 
-	public String getDirectory(){
+	public String getDirectory() {
 		return directory;
 	}
 
@@ -95,55 +96,54 @@ public class Peer {
 		this.hashtable = hashtable;
 	}
 
-	public void setNumFiles(int numFiles){
+	public void setNumFiles(int numFiles) {
 		this.numFiles = numFiles;
 	}
 
-	public void setFileNames(ArrayList<String> fileNames){
+	public void setFileNames(ArrayList<String> fileNames) {
 		this.fileNames.addAll(fileNames);
 	}
 
-	public void addFileName(String fileName){
+	public void addFileName(String fileName) {
 		this.fileNames.add(fileName);
 	}
 
-	public void setDirectory(String directory){
+	public void setDirectory(String directory) {
 		this.directory = directory;
 	}
 
-	//Override
-	public String toString(){
-		return peerId + ":" +address + ":" + port + ":" + directory;
+	// Override
+	public String toString() {
+		return peerId + ":" + address + ":" + port + ":" + directory;
 	}
-	
-public void server() throws IOException{
-    	
-    	try {
-    		serverSocket = new ServerSocket(port);
-    	} catch(Exception e){
-    		return;
-    	}
-		
-		while(true){
-			Socket socket = serverSocket.accept();
-			synchronized(peerQueue){
-				peerQueue.add(new Connection(socket,directory));
-			}
-			/*try {
-				Thread.sleep(2);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}*/
+
+	public void server() throws IOException {
+
+		try {
+			serverSocket = new ServerSocket(port);
+		} catch (Exception e) {
+			return;
 		}
-		
+
+		while (true) {
+			Socket socket = serverSocket.accept();
+			synchronized (peerQueue) {
+				peerQueue.add(new Connection(socket, directory));
+			}
+			/*
+			 * try { Thread.sleep(2); } catch (InterruptedException e) {
+			 * e.printStackTrace(); }
+			 */
+		}
+
 	}
-    
-    public void assign() throws IOException{
-		
+
+	public void assign() throws IOException {
+
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
-		while(true){
-			if(peerQueue.peek() == null){
+		while (true) {
+			if (peerQueue.peek() == null) {
 				try {
 					Thread.sleep(1);
 				} catch (InterruptedException e) {
@@ -151,20 +151,18 @@ public void server() throws IOException{
 				}
 				continue;
 			}
-			synchronized(peerQueue){
-				//System.out.println("Added to executor");
+			synchronized (peerQueue) {
+				// System.out.println("Added to executor");
 				Connection c = peerQueue.poll();
 				Server s = new Server(c.getSocket(), c.getDirectory());
 				executor.execute(s);
 			}
 		}
-		
+
 	}
-	
+
 	public boolean download(String fileName) {
 		return false;
 	}
-
-
 
 }

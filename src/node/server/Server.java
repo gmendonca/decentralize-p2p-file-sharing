@@ -9,26 +9,26 @@ import java.net.Socket;
 
 import util.Util;
 
-public class Server extends Thread{
-	
+public class Server extends Thread {
+
 	private String directory;
 	private Socket socket;
-	
-	public Server(Socket socket, String directory){
+
+	public Server(Socket socket, String directory) {
 		this.directory = directory;
 		this.socket = socket;
 	}
-	
-	public void run(){
-		try{
-	        DataInputStream dIn = new DataInputStream(socket.getInputStream());
-	        String fileName = dIn.readUTF();
-	        InputStream in = new FileInputStream(directory + "/" + fileName);
-	        OutputStream out = socket.getOutputStream();
-	        Util.copy(in, out);
-		}catch (IOException ioe){
+
+	public void run() {
+		try {
+			DataInputStream dIn = new DataInputStream(socket.getInputStream());
+			String fileName = dIn.readUTF();
+			InputStream in = new FileInputStream(directory + "/" + fileName);
+			OutputStream out = socket.getOutputStream();
+			Util.copy(in, out);
+		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
-		
+
 	}
 }

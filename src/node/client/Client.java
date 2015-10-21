@@ -23,29 +23,29 @@ public class Client extends Thread {
 	private static ArrayList<String> serverList;
 	private ArrayList<Socket> socketList;
 
-	public Client(Peer peer){
+	public Client(Peer peer) {
 		this.peer = peer;
 	}
 
-	//getters
-	public Peer getPeer(){
+	// getters
+	public Peer getPeer() {
 		return this.peer;
 	}
 
-	public ArrayList<String> getPeerList(){
+	public ArrayList<String> getPeerList() {
 		return peerList;
 	}
 
-	public ArrayList<Socket> getSocketList(){
+	public ArrayList<Socket> getSocketList() {
 		return this.socketList;
 	}
 
-	//setters
-	public void setPeer(Peer peer){
+	// setters
+	public void setPeer(Peer peer) {
 		this.peer = peer;
 	}
 
-	public void setPeerlist(){
+	public void setPeerlist() {
 		try {
 			peerList = DistributedHashtable.readConfigFile("peers");
 		} catch (IOException e) {
@@ -53,11 +53,11 @@ public class Client extends Thread {
 		}
 	}
 
-	public void setPeerList(ArrayList<String> peerList2){
+	public void setPeerList(ArrayList<String> peerList2) {
 		peerList = peerList2;
 	}
-	
-	public void setServerlist(){
+
+	public void setServerlist() {
 		try {
 			serverList = DistributedHashtable.readConfigFile("servers");
 		} catch (IOException e) {
@@ -65,27 +65,27 @@ public class Client extends Thread {
 		}
 	}
 
-	public void setServerList(ArrayList<String> serverList2){
+	public void setServerList(ArrayList<String> serverList2) {
 		serverList = serverList2;
 	}
 
-	public void setSocketList(ArrayList<Socket> socketList){
+	public void setSocketList(ArrayList<Socket> socketList) {
 		this.socketList = socketList;
 	}
 
 	// put
-	public Boolean registry()
-			throws Exception {
+	public Boolean registry() throws Exception {
 
 		int pId;
 		Socket socket;
 		boolean ack = false;
-		for(String fileName : peer.getFileNames()){
+		for (String fileName : peer.getFileNames()) {
 			pId = DistributedHashtable.hash(fileName, serverList.size());
 			socket = socketList.get(pId);
 
-			//synchronized(socket){
-			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+			// synchronized(socket){
+			DataOutputStream dOut = new DataOutputStream(
+					socket.getOutputStream());
 			// put option
 			dOut.writeByte(0);
 			dOut.flush();
@@ -98,8 +98,9 @@ public class Client extends Thread {
 
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			ack = dIn.readBoolean();
-			if(ack == false) break;
-			//}
+			if (ack == false)
+				break;
+			// }
 		}
 
 		return ack;
@@ -113,7 +114,7 @@ public class Client extends Thread {
 
 		ArrayList<String> resultList = new ArrayList<String>();
 		int numFiles;
-		//synchronized(socket){
+		// synchronized(socket){
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
 		// lookup option
@@ -126,10 +127,10 @@ public class Client extends Thread {
 
 		DataInputStream dIn = new DataInputStream(socket.getInputStream());
 		numFiles = dIn.readInt();
-		for(int i = 0; i < numFiles; i++){
+		for (int i = 0; i < numFiles; i++) {
 			resultList.add(dIn.readUTF());
 		}
-		//}
+		// }
 
 		return resultList;
 	}
@@ -141,8 +142,9 @@ public class Client extends Thread {
 
 		Socket socket = socketList.get(pId);
 		boolean ack;
-		synchronized(socket){
-			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		synchronized (socket) {
+			DataOutputStream dOut = new DataOutputStream(
+					socket.getOutputStream());
 
 			// put option
 			dOut.writeByte(2);
@@ -159,7 +161,7 @@ public class Client extends Thread {
 		return ack;
 	}
 
-	public boolean startIndexingServer(int port){
+	public boolean startIndexingServer(int port) {
 		ServerSocket serverSocket;
 		try {
 			serverSocket = new ServerSocket(port);
@@ -171,15 +173,15 @@ public class Client extends Thread {
 			Assign assign = new Assign(server);
 			assign.start();
 		} catch (IOException e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 			return false;
 		}
 
 		return true;
 	}
 
-	public void userInterface(){
-		int option, pId;
+	public void userInterface() {
+		int option;
 		String key = null;
 		Boolean result = false;
 		ArrayList<String> value;
@@ -190,8 +192,8 @@ public class Client extends Thread {
 		while (true) {
 			System.out.println("\n\nSelect the option:");
 			System.out.println("\t1 - Registry");
-			System.out.println("\t2 - Get");
-			System.out.println("\t3 - Del");
+			System.out.println("\t2 - Search");
+			System.out.println("\t3 - Download");
 
 			try {
 				option = scanner.nextInt();
@@ -199,48 +201,51 @@ public class Client extends Thread {
 					try {
 						result = registry();
 					} catch (Exception e) {
-						System.out
-						.println("Couldn't registry in the system.");
+						System.out.println("Couldn't registry in the system.");
 					}
 
-					System.out
-					.println(result ? "Registered!"
+					System.out.println(result ? "Registered!"
 							: "Not registered.");
 
 				} else if (option == 2) {
 
-					System.out.print("key: ");
+					System.out.print("File Name: ");
 					key = scanner.next();
 
 					try {
 						value = search(key);
 					} catch (Exception e) {
 						System.out
-						.println("Something went wrong and it couldn'd find the value.");
+								.println("Something went wrong and it couldn'd find the value.");
 						continue;
 					}
-					for(String s : value){
+					if (value.size() == 0) {
+						System.out.println("File not found in the system.");
+						continue;
+					}
+					for (String s : value) {
 						System.out.println(s);
 					}
 
 				} else if (option == 3) {
 
-					System.out.print("key: ");
+					System.out.print("File Name: ");
 					key = scanner.next();
 
-					pId = DistributedHashtable.hash(key, peerList.size());
-
 					try {
-						result = delete(key, pId);
+						value = search(key);
 					} catch (Exception e) {
 						System.out
-						.println("Something went wrong and it couldn'd delete the value.");
+								.println("Something went wrong and it couldn'd find the value.");
 						continue;
 					}
-
-					System.out.println(result ? "Key " + key + " was at Peer "
-							+ pId + "(" + peerList.get(pId)
-							+ ") and now is deleted." : "Key not deleted.");
+					if (value.size() == 0) {
+						System.out.println("File not found in the system.");
+						continue;
+					}
+					for (int i = 1; i <= value.size(); i++) {
+						System.out.println("\t" + i + " - " + value.get(i));
+					}
 
 				} else {
 					System.out.println("Option not valid");
@@ -257,11 +262,12 @@ public class Client extends Thread {
 	public static void main(String[] args) throws IOException {
 
 		peerList = DistributedHashtable.readConfigFile("peers");
-		
+
 		serverList = DistributedHashtable.readConfigFile("servers");
 
-		if(args.length < 4){
-			System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port> <Folder>");
+		if (args.length < 1) {
+			// System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port> <Folder>");
+			System.out.println("Usage: java -jar build/Client.jar <PeerId>");
 			return;
 		}
 
@@ -273,53 +279,59 @@ public class Client extends Thread {
 			return;
 		}
 
-		if(id > peerList.size()){
-			System.out.println("Peer Id shouldn't be greater than the number provided in the config file!");
+		if (id > peerList.size()) {
+			System.out
+					.println("Peer Id shouldn't be greater than the number provided in the config file!");
 			return;
 		}
 
-		String address = args[1];
+		// String address = args[1];
 
-		int port = 0;
-		try {
-			port = Integer.parseInt(args[2]);
-		} catch (Exception e) {
-			System.out.println("Put a valid port number");
-			return;
-		}
+		/*
+		 * int port = 0; try { port = Integer.parseInt(args[2]); } catch
+		 * (Exception e) { System.out.println("Put a valid port number");
+		 * return; }
+		 */
 
-		String dir = args[3];
+		String[] peerAddress;
+		peerAddress = peerList.get(id).split(":");
+		String address = peerAddress[0];
+		int port = Integer.parseInt(peerAddress[1]);
+
+		// String dir = args[3];
+		String dir = peerAddress[2];
 		File folder = new File(dir);
 
-		if(!folder.isDirectory()){
+		if (!folder.isDirectory()) {
 			System.out.println("Put a valid directory name");
 			return;
 		}
 
 		ArrayList<String> fileNames = Util.listFilesForFolder(folder);
-		final Peer peer = new Peer(id, address, port, dir, fileNames, fileNames.size());
-		
-		new Thread(){
-    		public void run(){
-    			try {
+		final Peer peer = new Peer(id, address, port, dir, fileNames,
+				fileNames.size());
+
+		new Thread() {
+			public void run() {
+				try {
 					peer.server();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-    		}
-    	}.start();
-    	
-    	new Thread(){
-    		public void run(){
-    			try {
+			}
+		}.start();
+
+		new Thread() {
+			public void run() {
+				try {
 					peer.assign();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-    		}
-    	}.start();
+			}
+		}.start();
 
-		String[] peerAddress;
+		String[] serverAddress;
 
 		ArrayList<Socket> socketList = new ArrayList<Socket>();
 
@@ -327,17 +339,17 @@ public class Client extends Thread {
 
 		// checking if all are open
 		for (id = 0; id < serverList.size(); id++) {
-			peerAddress = serverList.get(id).split(":");
-			address =  peerAddress[0];
-			port = Integer.parseInt(peerAddress[1]);
+			serverAddress = serverList.get(id).split(":");
+			address = serverAddress[0];
+			port = Integer.parseInt(serverAddress[1]);
 
 			try {
-				System.out.println("Testing connection to server " + address + ":"
-						+ port);
+				System.out.println("Testing connection to server " + address
+						+ ":" + port);
 				Socket s = new Socket(address, port);
 				socketList.add(s);
-				System.out.println("Server " + address + ":"
-						+ port + " is running.");
+				System.out.println("Server " + address + ":" + port
+						+ " is running.");
 			} catch (Exception e) {
 				// System.out.println("Not connected to server " + address + ":"
 				// + port);

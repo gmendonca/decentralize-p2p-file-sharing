@@ -11,7 +11,8 @@ import org.json.simple.parser.JSONParser;
 
 public class DistributedHashtable {
 
-	public static ArrayList<String> readConfigFile(String element) throws IOException {
+	public static ArrayList<String> readConfigFile(String element)
+			throws IOException {
 		// read from a JSON
 		JSONParser parser = new JSONParser();
 		ArrayList<String> peerList = new ArrayList<String>();
@@ -43,7 +44,8 @@ public class DistributedHashtable {
 		int sum = 0;
 		for (int i = 0; i < key.length(); i++)
 			sum += key.charAt(i);
-
+		System.out.println("filename: " + key + " " + sum + " " + sum
+				% numPeers);
 		return sum % numPeers;
 	}
 }

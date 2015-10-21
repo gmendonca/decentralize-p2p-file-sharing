@@ -14,7 +14,7 @@ public class Deploy {
 	public static void main(String[] args) throws IOException {
 		// Creating servers
 
-		if(args.length < 1){
+		if (args.length < 1) {
 			System.out.println("Usage: java -jar build/Deploy.jar <ServerId>");
 			return;
 		}
@@ -35,10 +35,9 @@ public class Deploy {
 		IndexingServer server = new IndexingServer(serverSocket);
 		server.start();
 
-		//start assign server
+		// start assign server
 		Assign assign = new Assign(server);
 		assign.start();
 	}
-
 
 }
