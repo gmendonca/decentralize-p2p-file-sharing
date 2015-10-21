@@ -161,8 +161,4 @@ public class Peer {
 
 	}
 
-	public boolean download(String fileName) {
-		return false;
-	}
-
 }

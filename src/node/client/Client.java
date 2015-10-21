@@ -6,7 +6,10 @@ import index.server.IndexingServer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -134,31 +137,32 @@ public class Client extends Thread {
 
 		return resultList;
 	}
-
-	// delete
-	public Boolean delete(String key, int pId) throws Exception {
-		if (key.length() > 24)
-			return false;
-
-		Socket socket = socketList.get(pId);
-		boolean ack;
-		synchronized (socket) {
-			DataOutputStream dOut = new DataOutputStream(
-					socket.getOutputStream());
-
-			// put option
-			dOut.writeByte(2);
-			dOut.flush();
-
-			// key
-			dOut.writeUTF(key);
-			dOut.flush();
-
-			DataInputStream dIn = new DataInputStream(socket.getInputStream());
-			ack = dIn.readBoolean();
-		}
-
-		return ack;
+	
+	public void download(String fileName, int peerId, String peer) throws Exception {
+		String [] peerAddress = peer.split(":");
+		Socket socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
+    	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+    	dOut.writeUTF(fileName);
+        InputStream in = socket.getInputStream();
+        
+        String folder = "downloads-peer" + peerId + "/";
+        File f = new File(folder);
+        Boolean created = false;
+        if (!f.exists()){
+        	try {
+        		created = f.mkdir();
+        	}catch (Exception e){
+        		System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+        	}
+        }else {
+        	created = true;
+        }
+        
+        //if(i != -1) fileName = fileName + i;
+        
+        OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
+        Util.copy(in, out);
+        System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
 	}
 
 	public boolean startIndexingServer(int port) {
@@ -181,7 +185,7 @@ public class Client extends Thread {
 	}
 
 	public void userInterface() {
-		int option;
+		int option, downopt;
 		String key = null;
 		Boolean result = false;
 		ArrayList<String> value;
@@ -246,12 +250,21 @@ public class Client extends Thread {
 					for (int i = 1; i <= value.size(); i++) {
 						System.out.println("\t" + i + " - " + value.get(i-1));
 					}
+					while(true){
+						System.out.print("Peer: ");
+						downopt = scanner.nextInt();
+						if(downopt < 0 || downopt > value.size())
+							continue;
+						download(key,downopt-1,value.get(downopt-1));
+						break;
+					}
 
 				} else {
 					System.out.println("Option not valid");
 					continue;
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				System.out.println("Oops, something went wrong. Closing it!");
 				break;
 			}
