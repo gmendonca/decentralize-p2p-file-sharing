@@ -24,10 +24,13 @@ public class Client extends Thread {
 	private Peer peer;
 	private static ArrayList<String> peerList;
 	private static ArrayList<String> serverList;
-	private ArrayList<Socket> socketList;
+	private ArrayList<Socket> serverSocketList;
+	private Socket[] peerSocketList;
 
 	public Client(Peer peer) {
 		this.peer = peer;
+		
+		peerSocketList = new Socket[peerList.size()];
 	}
 
 	// getters
@@ -39,8 +42,12 @@ public class Client extends Thread {
 		return peerList;
 	}
 
-	public ArrayList<Socket> getSocketList() {
-		return this.socketList;
+	public ArrayList<Socket> getServerSocketList() {
+		return this.serverSocketList;
+	}
+	
+	public Socket[] getPeerSocketList() {
+		return this.peerSocketList;
 	}
 
 	// setters
@@ -72,8 +79,16 @@ public class Client extends Thread {
 		serverList = serverList2;
 	}
 
-	public void setSocketList(ArrayList<Socket> socketList) {
-		this.socketList = socketList;
+	public void setServerSocketList(ArrayList<Socket> serverSocketList) {
+		this.serverSocketList = serverSocketList;
+	}
+	
+	public void setPeerSocketList(Socket[] peerSocketList) {
+		this.peerSocketList = peerSocketList;
+	}
+	
+	public void addPeerSocket(Socket peerSocket, int pos) {
+		this.peerSocketList[pos] = peerSocket;
 	}
 
 	// put
@@ -84,7 +99,7 @@ public class Client extends Thread {
 		boolean ack = false;
 		for (String fileName : peer.getFileNames()) {
 			pId = DistributedHashtable.hash(fileName, serverList.size());
-			socket = socketList.get(pId);
+			socket = serverSocketList.get(pId);
 
 			// synchronized(socket){
 			DataOutputStream dOut = new DataOutputStream(
@@ -113,7 +128,7 @@ public class Client extends Thread {
 	public ArrayList<String> search(String fileName) throws IOException {
 
 		int pId = DistributedHashtable.hash(fileName, serverList.size());
-		Socket socket = socketList.get(pId);
+		Socket socket = serverSocketList.get(pId);
 
 		ArrayList<String> resultList = new ArrayList<String>();
 		int numFiles;
@@ -141,9 +156,16 @@ public class Client extends Thread {
 	public void download(String fileName, int peerId, String peer) throws Exception {
 		String [] peerAddress = peer.split(":");
 		//TODO: create a socket list for the peers too
-		Socket socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
+		Socket socket;
+		if(peerSocketList[peerId] == null){
+			socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
+			addPeerSocket(socket, peerId);
+		} else {
+			socket = getPeerSocketList()[peerId];
+		}
     	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
     	dOut.writeUTF(fileName);
+    	dOut.flush();
         InputStream in = socket.getInputStream();
         
         String folder = "downloads-peer" + peerId + "/";
@@ -163,6 +185,7 @@ public class Client extends Thread {
         
         OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
         Util.copy(in, out);
+        out.close();
         System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
 	}
 
@@ -257,6 +280,7 @@ public class Client extends Thread {
 						if(downopt < 0 || downopt > value.size())
 							continue;
 						download(key,downopt-1,value.get(downopt-1));
+						System.out.println("File downloaded!");
 						break;
 					}
 
@@ -348,7 +372,7 @@ public class Client extends Thread {
 
 		String[] serverAddress;
 
-		ArrayList<Socket> socketList = new ArrayList<Socket>();
+		ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
 
 		Client c = new Client(peer);
 
@@ -362,7 +386,7 @@ public class Client extends Thread {
 				System.out.println("Testing connection to server " + address
 						+ ":" + port);
 				Socket s = new Socket(address, port);
-				socketList.add(s);
+				serverSocketList.add(s);
 				System.out.println("Server " + address + ":" + port
 						+ " is running.");
 			} catch (Exception e) {
@@ -373,7 +397,7 @@ public class Client extends Thread {
 				port--;
 			}
 		}
-		c.setSocketList(socketList);
+		c.setServerSocketList(serverSocketList);
 		c.userInterface();
 	}
 

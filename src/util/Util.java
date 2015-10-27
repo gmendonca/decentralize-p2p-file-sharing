@@ -30,6 +30,7 @@ public class Util {
 		while ((count = in.read(buffer)) != -1) {
 			out.write(buffer, 0, count);
 		}
+		out.flush();
 		System.out.println("Download took "
 				+ (System.currentTimeMillis() - start) + " ms.");
 	}

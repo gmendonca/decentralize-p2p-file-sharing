@@ -26,6 +26,7 @@ public class Server extends Thread {
 			InputStream in = new FileInputStream(directory + "/" + fileName);
 			OutputStream out = socket.getOutputStream();
 			Util.copy(in, out);
+	        in.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
