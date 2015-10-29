@@ -22,13 +22,17 @@ public class Util {
 
 	}
 
-	public static void copy(InputStream in, OutputStream out)
+	public static void copy(InputStream in, OutputStream out, long fileSize)
 			throws IOException {
+		System.out.println("fileSize = " + fileSize);
 		byte[] buffer = new byte[1024];
-		int count = 0;
+		int count = 0, total = 0;
 		long start = System.currentTimeMillis();
-		while ((count = in.read(buffer)) != -1) {
+		while (total != fileSize) {
+			count = in.read(buffer);
+			System.out.println("count = " + count);
 			out.write(buffer, 0, count);
+			total += count;
 		}
 		out.flush();
 		System.out.println("Download took "

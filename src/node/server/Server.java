@@ -1,11 +1,11 @@
 package node.server;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 import util.Util;
@@ -22,12 +22,19 @@ public class Server extends Thread {
 
 	public void run() {
 		try {
+			System.out.println("here");	
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			String fileName = dIn.readUTF();
+			System.out.println("fileName read " + fileName);
 			InputStream in = new FileInputStream(directory + "/" + fileName);
-			OutputStream out = socket.getOutputStream();
-			Util.copy(in, out);
-	        in.close();
+			long fileSize = new File(directory + "/" + fileName).length();
+			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+			dOut.writeLong(fileSize);
+			dOut.flush();
+			System.out.println("fileSize writen");
+
+			Util.copy(in, dOut, fileSize);
+			in.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}

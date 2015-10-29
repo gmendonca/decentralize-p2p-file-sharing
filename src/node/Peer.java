@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 
 import util.PeerQueue;
 import node.client.Connection;
+import node.server.OpenServer;
 import node.server.Server;
 
 public class Peer {
@@ -116,6 +117,23 @@ public class Peer {
 	public String toString() {
 		return peerId + ":" + address + ":" + port + ":" + directory;
 	}
+	
+	public void openServer() throws IOException {
+		
+		try {
+			serverSocket = new ServerSocket(port);
+		} catch (Exception e) {
+			return;
+		}
+
+		while (true) {
+			System.out.println("waiting for connection");
+			Socket socket = serverSocket.accept();
+			System.out.println("connection accepted");
+			OpenServer os = new OpenServer(socket,directory);
+			os.start();
+		}
+	}
 
 	public void server() throws IOException {
 
@@ -126,14 +144,16 @@ public class Peer {
 		}
 
 		while (true) {
+			System.out.println("waiting for connection");
 			Socket socket = serverSocket.accept();
+			System.out.println("connection accepted");
 			synchronized (peerQueue) {
 				peerQueue.add(new Connection(socket, directory));
+				System.out.println("connection added");
 			}
-			/*
-			 * try { Thread.sleep(2); } catch (InterruptedException e) {
-			 * e.printStackTrace(); }
-			 */
+
+			//try { Thread.sleep(2); } catch (InterruptedException e) {
+			//	e.printStackTrace(); }
 		}
 
 	}
@@ -152,10 +172,11 @@ public class Peer {
 				continue;
 			}
 			synchronized (peerQueue) {
-				// System.out.println("Added to executor");
+				System.out.println("Added to executor");
 				Connection c = peerQueue.poll();
 				Server s = new Server(c.getSocket(), c.getDirectory());
 				executor.execute(s);
+				System.out.println("Executed");
 			}
 		}
 

@@ -8,7 +8,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,7 +28,7 @@ public class Client extends Thread {
 
 	public Client(Peer peer) {
 		this.peer = peer;
-		
+
 		peerSocketList = new Socket[peerList.size()];
 	}
 
@@ -45,7 +44,7 @@ public class Client extends Thread {
 	public ArrayList<Socket> getServerSocketList() {
 		return this.serverSocketList;
 	}
-	
+
 	public Socket[] getPeerSocketList() {
 		return this.peerSocketList;
 	}
@@ -82,11 +81,11 @@ public class Client extends Thread {
 	public void setServerSocketList(ArrayList<Socket> serverSocketList) {
 		this.serverSocketList = serverSocketList;
 	}
-	
+
 	public void setPeerSocketList(Socket[] peerSocketList) {
 		this.peerSocketList = peerSocketList;
 	}
-	
+
 	public void addPeerSocket(Socket peerSocket, int pos) {
 		this.peerSocketList[pos] = peerSocket;
 	}
@@ -152,7 +151,7 @@ public class Client extends Thread {
 
 		return resultList;
 	}
-	
+
 	public void download(String fileName, int peerId, String peer) throws Exception {
 		String [] peerAddress = peer.split(":");
 		Socket socket;
@@ -162,30 +161,35 @@ public class Client extends Thread {
 		} else {
 			socket = getPeerSocketList()[peerId];
 		}
-    	DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
-    	dOut.writeUTF(fileName);
-    	dOut.flush();
-        InputStream in = socket.getInputStream();
-        
-        String folder = "downloads-peer" + peerId + "/";
-        File f = new File(folder);
-        Boolean created = false;
-        if (!f.exists()){
-        	try {
-        		created = f.mkdir();
-        	}catch (Exception e){
-        		System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
-        	}
-        }else {
-        	created = true;
-        }
-        
-        //if(i != -1) fileName = fileName + i;
-        
-        OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
-        Util.copy(in, out);
-        out.close();
-        System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
+
+		System.out.println("here");
+		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		dOut.writeUTF(fileName);
+		dOut.flush();
+		System.out.println("name writen");
+
+		DataInputStream dIn = new DataInputStream(socket.getInputStream());
+		long fileSize = dIn.readLong();
+		System.out.println("fileSize read = " + fileSize);
+		String folder = "downloads-peer" + peerId + "/";
+		File f = new File(folder);
+		Boolean created = false;
+		if (!f.exists()){
+			try {
+				created = f.mkdir();
+			}catch (Exception e){
+				System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+			}
+		}else {
+			created = true;
+		}
+
+		//if(i != -1) fileName = fileName + i;
+
+		OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
+		Util.copy(dIn, out, fileSize);
+		out.close();
+		System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
 	}
 
 	public boolean startIndexingServer(int port) {
@@ -243,7 +247,7 @@ public class Client extends Thread {
 						value = search(key);
 					} catch (Exception e) {
 						System.out
-								.println("Something went wrong and it couldn'd find the value.");
+						.println("Something went wrong and it couldn'd find the value.");
 						continue;
 					}
 					if (value.size() == 0) {
@@ -263,7 +267,7 @@ public class Client extends Thread {
 						value = search(key);
 					} catch (Exception e) {
 						System.out
-								.println("Something went wrong and it couldn'd find the value.");
+						.println("Something went wrong and it couldn'd find the value.");
 						continue;
 					}
 					if (value.size() == 0) {
@@ -296,6 +300,40 @@ public class Client extends Thread {
 		scanner.close();
 		return;
 	}
+	
+	public static void startServers(final Peer peer){
+		new Thread() {
+			public void run() {
+				try {
+					peer.server();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+
+		new Thread() {
+			public void run() {
+				try {
+					peer.assign();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
+	
+	public static void startOpenServer(final Peer peer){
+		new Thread() {
+			public void run() {
+				try {
+					peer.openServer();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
+	}
 
 	public static void main(String[] args) throws IOException {
 
@@ -319,7 +357,7 @@ public class Client extends Thread {
 
 		if (id > peerList.size()) {
 			System.out
-					.println("Peer Id shouldn't be greater than the number provided in the config file!");
+			.println("Peer Id shouldn't be greater than the number provided in the config file!");
 			return;
 		}
 
@@ -349,25 +387,9 @@ public class Client extends Thread {
 		final Peer peer = new Peer(id, address, port, dir, fileNames,
 				fileNames.size());
 
-		new Thread() {
-			public void run() {
-				try {
-					peer.server();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
-
-		new Thread() {
-			public void run() {
-				try {
-					peer.assign();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}.start();
+		//startServers(peer);
+		startOpenServer(peer);
+		
 
 		String[] serverAddress;
 
