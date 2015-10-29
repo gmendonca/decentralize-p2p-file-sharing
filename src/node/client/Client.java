@@ -155,7 +155,6 @@ public class Client extends Thread {
 	
 	public void download(String fileName, int peerId, String peer) throws Exception {
 		String [] peerAddress = peer.split(":");
-		//TODO: create a socket list for the peers too
 		Socket socket;
 		if(peerSocketList[peerId] == null){
 			socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
