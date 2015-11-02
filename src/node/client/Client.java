@@ -125,9 +125,10 @@ public class Client extends Thread {
 	}
 
 	// get
-	public ArrayList<String> search(String fileName) throws IOException {
+	public ArrayList<String> search(String fileName, boolean resilience) throws IOException {
 
 		int pId = DistributedHashtable.hash(fileName, serverList.size());
+		pId = resilience ? ((pId == serverList.size() -1) ? 0 : pId + 1) : pId;
 		Socket socket = serverSocketList.get(pId);
 
 		ArrayList<String> resultList = new ArrayList<String>();
@@ -246,11 +247,15 @@ public class Client extends Thread {
 					key = scanner.next();
 
 					try {
-						value = search(key);
+						value = search(key, false);
 					} catch (Exception e) {
-						System.out
-						.println("Something went wrong and it couldn'd find the value.");
-						continue;
+						try {
+							value = search(key, true);
+						} catch (Exception e1) {
+							System.out
+							.println("Something went wrong and it couldn'd find the file.");
+							continue;
+						}
 					}
 					if (value.size() == 0) {
 						System.out.println("File not found in the system.");
@@ -266,11 +271,15 @@ public class Client extends Thread {
 					key = scanner.next();
 
 					try {
-						value = search(key);
+						value = search(key, false);
 					} catch (Exception e) {
-						System.out
-						.println("Something went wrong and it couldn'd find the value.");
-						continue;
+						try {
+							value = search(key, true);
+						} catch (Exception e1) {
+							System.out
+							.println("Something went wrong and it couldn'd find the file.");
+							continue;
+						}
 					}
 					if (value.size() == 0) {
 						System.out.println("File not found in the system.");
