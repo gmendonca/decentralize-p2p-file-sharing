@@ -91,13 +91,14 @@ public class Client extends Thread {
 	}
 
 	// put
-	public Boolean registry() throws Exception {
+	public Boolean registry(boolean resilience) throws Exception {
 
 		int pId;
 		Socket socket;
 		boolean ack = false;
 		for (String fileName : peer.getFileNames()) {
 			pId = DistributedHashtable.hash(fileName, serverList.size());
+			pId = resilience ? ((pId == serverList.size() -1) ? 0 : pId + 1) : pId;
 			socket = serverSocketList.get(pId);
 
 			// synchronized(socket){
@@ -230,7 +231,8 @@ public class Client extends Thread {
 				option = scanner.nextInt();
 				if (option == 1) {
 					try {
-						result = registry();
+						result = registry(false);
+						result = registry(true);
 					} catch (Exception e) {
 						System.out.println("Couldn't registry in the system.");
 					}
