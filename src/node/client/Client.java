@@ -227,6 +227,7 @@ public class Client extends Thread {
 			System.out.println("\t1 - Registry");
 			System.out.println("\t2 - Search");
 			System.out.println("\t3 - Download");
+			System.out.println("\t4 - Close");
 
 			try {
 				option = scanner.nextInt();
@@ -298,18 +299,22 @@ public class Client extends Thread {
 						break;
 					}
 
-				} else {
+				} else if(option ==4) {
+					System.out.println("Bye bye!");
+					scanner.close();
+					return;
+				}else {
+
 					System.out.println("Option not valid");
 					continue;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.println("Oops, something went wrong. Closing it!");
-				break;
+				//e.printStackTrace();
+				System.out.println("Oops, something went wrong.");
+				scanner = new Scanner(System.in);
+				//break;
 			}
 		}
-		scanner.close();
-		return;
 	}
 	
 	public static void startServers(final Peer peer){
@@ -431,6 +436,7 @@ public class Client extends Thread {
 		}
 		c.setServerSocketList(serverSocketList);
 		c.userInterface();
+		System.exit(1);
 	}
 
 }
