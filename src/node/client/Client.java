@@ -213,6 +213,11 @@ public class Client extends Thread {
 		return true;
 	}
 
+	private void replicateFiles() {
+
+
+	}
+
 	public void userInterface() {
 		int option, downopt;
 		String key = null;
@@ -316,7 +321,7 @@ public class Client extends Thread {
 			}
 		}
 	}
-	
+
 	public static void startServers(final Peer peer){
 		new Thread() {
 			public void run() {
@@ -338,7 +343,7 @@ public class Client extends Thread {
 			}
 		}.start();
 	}
-	
+
 	public static void startOpenServer(final Peer peer){
 		new Thread() {
 			public void run() {
@@ -405,7 +410,7 @@ public class Client extends Thread {
 
 		//startServers(peer);
 		startOpenServer(peer);
-		
+
 
 		String[] serverAddress;
 
@@ -435,6 +440,8 @@ public class Client extends Thread {
 			}
 		}
 		c.setServerSocketList(serverSocketList);
+
+		c.replicateFiles();
 		c.userInterface();
 		System.exit(1);
 	}
