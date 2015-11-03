@@ -388,7 +388,7 @@ public class Client extends Thread {
 		}
 	}
 
-	public static void startServers(final Peer peer) {
+	public void startServers() {
 		new Thread() {
 			public void run() {
 				try {
@@ -410,7 +410,7 @@ public class Client extends Thread {
 		}.start();
 	}
 
-	public static void startOpenServer(final Peer peer) {
+	public void startOpenServer() {
 		new Thread() {
 			public void run() {
 				try {
@@ -474,14 +474,16 @@ public class Client extends Thread {
 		final Peer peer = new Peer(id, address, port, dir, fileNames,
 				fileNames.size());
 
-		// startServers(peer);
-		startOpenServer(peer);
+		
 
 		String[] serverAddress;
 
 		ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
 
 		Client c = new Client(peer);
+		
+		// startServers();
+		c.startOpenServer();
 
 		int i;
 		// checking if all are open
