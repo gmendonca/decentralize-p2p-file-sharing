@@ -213,8 +213,18 @@ public class Client extends Thread {
 		return true;
 	}
 
-	private void replicateFiles() {
-
+	private void replicateFiles(int peerId) throws Exception {
+		String [] peerAddress = peerList.get(peerId).split(":");
+		Socket socket;
+		if(peerSocketList[peerId] == null) {
+			socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
+			addPeerSocket(socket, peerId);
+		} else {
+			socket = getPeerSocketList()[peerId];
+		}
+		for(String file : peer.getFileNames()){
+			
+		}
 
 	}
 
@@ -441,7 +451,11 @@ public class Client extends Thread {
 		}
 		c.setServerSocketList(serverSocketList);
 
-		c.replicateFiles();
+		try {
+			c.replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		c.userInterface();
 		System.exit(1);
 	}
