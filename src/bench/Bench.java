@@ -50,6 +50,8 @@ public class Bench {
 			assign.start();
 		}
 		
+		Client c1 = null;
+		
 		for(int id = 0; id <  peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
 			String address = peerAddress[0];
@@ -73,6 +75,7 @@ public class Bench {
 			}
 
 			Client c = new Client(peer);
+			if(id == 0) c1 = c;
 			c.startOpenServer();
 			
 			ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
@@ -96,10 +99,11 @@ public class Bench {
 			}
 			c.setServerSocketList(serverSocketList);
 			
-			if(id == 0) c.userInterface();
+			c.setPeerSocketList(new Socket[peerList.size()]);
+			
 		}
 		
-		
+		c1.userInterface();
 
 	}
 

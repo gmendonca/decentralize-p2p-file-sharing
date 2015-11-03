@@ -30,8 +30,6 @@ public class Client extends Thread {
 
 	public Client(Peer peer) {
 		this.peer = peer;
-
-		peerSocketList = new Socket[peerList.size()];
 	}
 
 	// getters
@@ -508,6 +506,8 @@ public class Client extends Thread {
 			}
 		}
 		c.setServerSocketList(serverSocketList);
+		
+		c.setPeerSocketList(new Socket[peerList.size()]);
 
 		c.userInterface();
 		System.exit(1);
