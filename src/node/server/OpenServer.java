@@ -28,6 +28,7 @@ public class OpenServer extends Thread {
 				long fileSize;
 				DataInputStream dIn = new DataInputStream(
 						socket.getInputStream());
+				DataOutputStream dOut  = null;
 
 				byte option = dIn.readByte();
 				switch (option) {
@@ -38,7 +39,7 @@ public class OpenServer extends Thread {
 					InputStream in = new FileInputStream(directory + "/"
 							+ fileName);
 					fileSize = new File(directory + "/" + fileName).length();
-					DataOutputStream dOut = new DataOutputStream(
+					dOut = new DataOutputStream(
 							socket.getOutputStream());
 					dOut.writeLong(fileSize);
 					dOut.flush();
@@ -72,11 +73,13 @@ public class OpenServer extends Thread {
 					OutputStream out = (created) ? new FileOutputStream(
 							f.toString() + "/" + fileName)
 					: new FileOutputStream(fileName);
-							Util.copy(dIn, out, fileSize);
-							out.close();
-							System.out.println("File " + fileName
+					Util.copy(dIn, out, fileSize);
+					out.close();
+					System.out.println("File " + fileName
 									+ " received from peer " + peerId);
-							break;
+					dOut = new DataOutputStream(socket.getOutputStream());
+					dOut.writeUTF("File recieved");
+					break;
 				default:
 					throw new Exception();
 				}
