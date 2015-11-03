@@ -28,8 +28,24 @@ public class Client extends Thread {
 	private ArrayList<Socket> serverSocketList;
 	private Socket[] peerSocketList;
 
+	public Client() {	
+		try {
+			peerList = DistributedHashtable.readConfigFile("peers");
+			serverList = DistributedHashtable.readConfigFile("servers");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Client(Peer peer) {
 		this.peer = peer;
+		
+		try {
+			peerList = DistributedHashtable.readConfigFile("peers");
+			serverList = DistributedHashtable.readConfigFile("servers");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// getters
@@ -303,8 +319,9 @@ public class Client extends Thread {
 							replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
 							break;
 						} catch (Exception e) {
-							//e.printStackTrace();
+							e.printStackTrace();
 							System.out.println("Cannot replicate, trying again...");
+							try { Thread.sleep(5000); } catch (Exception e1) { } 
 						}
 					}
 
@@ -421,10 +438,8 @@ public class Client extends Thread {
 	}
 
 	public static void main(String[] args) throws IOException {
-
-		peerList = DistributedHashtable.readConfigFile("peers");
-
-		serverList = DistributedHashtable.readConfigFile("servers");
+		
+		Client c = new Client();
 
 		if (args.length < 1) {
 			// System.out.println("Usage: java -jar build/Client.jar <PeerId> <Address> <Port> <Folder>");
@@ -472,14 +487,12 @@ public class Client extends Thread {
 		final Peer peer = new Peer(id, address, port, dir, fileNames,
 				fileNames.size());
 
-		
-
 		String[] serverAddress;
 
 		ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
 
-		Client c = new Client(peer);
 		
+		c.setPeer(peer);
 		// startServers();
 		c.startOpenServer();
 

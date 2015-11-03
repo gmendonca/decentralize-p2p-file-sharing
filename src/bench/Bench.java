@@ -75,7 +75,6 @@ public class Bench {
 			}
 
 			Client c = new Client(peer);
-			if(id == 0) c1 = c;
 			c.startOpenServer();
 			
 			ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
@@ -100,6 +99,7 @@ public class Bench {
 			c.setServerSocketList(serverSocketList);
 			
 			c.setPeerSocketList(new Socket[peerList.size()]);
+			if(id == 0) c1 = c;
 			
 		}
 		
