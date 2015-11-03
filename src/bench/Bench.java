@@ -6,6 +6,7 @@ import index.server.IndexingServer;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import node.Peer;
@@ -49,8 +50,8 @@ public class Bench {
 			assign.start();
 		}
 		
-		for(int i = 0; i <  peerList.size(); i++) {
-			peerAddress = peerList.get(i).split(":");
+		for(int id = 0; id <  peerList.size(); id++) {
+			peerAddress = peerList.get(id).split(":");
 			String address = peerAddress[0];
 			port = Integer.parseInt(peerAddress[1]);
 
@@ -65,16 +66,40 @@ public class Bench {
 			ArrayList<String> fileNames = Util.listFilesForFolder(folder);
 			Peer peer = null;
 			try {
-				peer = new Peer(i, address, port, dir, fileNames,
+				peer = new Peer(id, address, port, dir, fileNames,
 						fileNames.size());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
 			Client c = new Client(peer);
-			Client.startOpenServer(peer);
+			c.startOpenServer();
 			
+			ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
+			
+			for (int i = 0; i < serverList.size(); i++) {
+				serverAddress = serverList.get(i).split(":");
+				address = serverAddress[0];
+				port = Integer.parseInt(serverAddress[1]);
+
+				try {
+					System.out.println("Testing connection to server " + address
+							+ ":" + port);
+					Socket s = new Socket(address, port);
+					serverSocketList.add(s);
+					System.out.println("Server " + address + ":" + port
+							+ " is running.");
+				} catch (Exception e) {
+					i--;
+					port--;
+				}
+			}
+			c.setServerSocketList(serverSocketList);
+			
+			if(id == 0) c.userInterface();
 		}
+		
+		
 
 	}
 
