@@ -264,6 +264,7 @@ public class Client extends Thread {
 			in.close();
 			System.out
 			.println("File " + fileName + " sent for replication");
+			try { Thread.sleep(5); } catch (Exception e) { } 
 		}
 
 	}

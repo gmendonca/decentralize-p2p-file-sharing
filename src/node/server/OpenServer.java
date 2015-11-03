@@ -49,6 +49,7 @@ public class OpenServer extends Thread {
 					break;
 				case 1:
 					// replicating files
+					System.out.println("here");
 					int peerId = dIn.readInt();
 					fileName = dIn.readUTF();
 					System.out.println("fileName read " + fileName);
@@ -62,7 +63,7 @@ public class OpenServer extends Thread {
 							created = f.mkdir();
 						} catch (Exception e) {
 							System.out
-									.println("Couldn't create the folder, the file will be saved in the current directory!");
+							.println("Couldn't create the folder, the file will be saved in the current directory!");
 						}
 					} else {
 						created = true;
@@ -70,12 +71,12 @@ public class OpenServer extends Thread {
 
 					OutputStream out = (created) ? new FileOutputStream(
 							f.toString() + "/" + fileName)
-							: new FileOutputStream(fileName);
-					Util.copy(dIn, out, fileSize);
-					out.close();
-					System.out.println("File " + fileName
-							+ " received from peer " + peerId);
-					break;
+					: new FileOutputStream(fileName);
+							Util.copy(dIn, out, fileSize);
+							out.close();
+							System.out.println("File " + fileName
+									+ " received from peer " + peerId);
+							break;
 				default:
 					throw new Exception();
 				}
