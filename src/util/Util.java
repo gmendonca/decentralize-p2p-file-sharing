@@ -30,7 +30,7 @@ public class Util {
 		long start = System.currentTimeMillis();
 		while (total != fileSize) {
 			count = in.read(buffer);
-			System.out.println("count = " + count);
+			//System.out.println("count = " + count);
 			out.write(buffer, 0, count);
 			total += count;
 		}

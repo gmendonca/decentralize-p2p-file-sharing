@@ -4,8 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 import util.Util;
@@ -23,6 +24,9 @@ public class OpenServer extends Thread {
 	public void run() {
 		try {
 			while (true) {
+				
+				String fileName;
+				long fileSize;
 				System.out.println("here");
 				DataInputStream dIn = new DataInputStream(
 						socket.getInputStream());
@@ -31,11 +35,11 @@ public class OpenServer extends Thread {
 				switch (option) {
 				case 0:
 					//download
-					String fileName = dIn.readUTF();
+					fileName = dIn.readUTF();
 					System.out.println("fileName read " + fileName);
 					InputStream in = new FileInputStream(directory + "/"
 							+ fileName);
-					long fileSize = new File(directory + "/" + fileName)
+					fileSize = new File(directory + "/" + fileName)
 							.length();
 					DataOutputStream dOut = new DataOutputStream(
 							socket.getOutputStream());
@@ -47,10 +51,33 @@ public class OpenServer extends Thread {
 					in.close();
 				case 1:
 					//replicating files
+					int peerId = dIn.readInt();
+					fileName = dIn.readUTF();
+					System.out.println("fileName read " + fileName);
+					fileSize = dIn.readLong();
+					System.out.println("fileSize read = " + fileSize);
+					String folder = "replication-peer" + peerId + "/";
+					File f = new File(folder);
+					Boolean created = false;
+					if (!f.exists()){
+						try {
+							created = f.mkdir();
+						}catch (Exception e){
+							System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+						}
+					}else {
+						created = true;
+					}
+
+					OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
+					Util.copy(dIn, out, fileSize);
+					out.close();
+					System.out.println("File " + fileName + " received from peer " + peerId);
 				default:
+					throw new Exception();
 				}
 			}
-		} catch (IOException ioe) {
+		} catch (Exception e) {
 			// ioe.printStackTrace();
 		}
 

@@ -6,8 +6,10 @@ import index.server.IndexingServer;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -98,7 +100,8 @@ public class Client extends Thread {
 		boolean ack = false;
 		for (String fileName : peer.getFileNames()) {
 			pId = DistributedHashtable.hash(fileName, serverList.size());
-			pId = resilience ? ((pId == serverList.size() -1) ? 0 : pId + 1) : pId;
+			pId = resilience ? ((pId == serverList.size() - 1) ? 0 : pId + 1)
+					: pId;
 			socket = serverSocketList.get(pId);
 
 			// synchronized(socket){
@@ -125,10 +128,11 @@ public class Client extends Thread {
 	}
 
 	// get
-	public ArrayList<String> search(String fileName, boolean resilience) throws IOException {
+	public ArrayList<String> search(String fileName, boolean resilience)
+			throws IOException {
 
 		int pId = DistributedHashtable.hash(fileName, serverList.size());
-		pId = resilience ? ((pId == serverList.size() -1) ? 0 : pId + 1) : pId;
+		pId = resilience ? ((pId == serverList.size() - 1) ? 0 : pId + 1) : pId;
 		Socket socket = serverSocketList.get(pId);
 
 		ArrayList<String> resultList = new ArrayList<String>();
@@ -154,11 +158,13 @@ public class Client extends Thread {
 		return resultList;
 	}
 
-	public void download(String fileName, int peerId, String peer) throws Exception {
-		String [] peerAddress = peer.split(":");
+	public void download(String fileName, int peerId, String peer)
+			throws Exception {
+		String[] peerAddress = peer.split(":");
 		Socket socket;
-		if(peerSocketList[peerId] == null){
-			socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
+		if (peerSocketList[peerId] == null) {
+			socket = new Socket(peerAddress[1],
+					Integer.parseInt(peerAddress[2]));
 			addPeerSocket(socket, peerId);
 		} else {
 			socket = getPeerSocketList()[peerId];
@@ -166,6 +172,9 @@ public class Client extends Thread {
 
 		System.out.println("here");
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
+		// download option
+		dOut.writeByte(0);
+		dOut.flush();
 		dOut.writeUTF(fileName);
 		dOut.flush();
 		System.out.println("name writen");
@@ -176,22 +185,25 @@ public class Client extends Thread {
 		String folder = "downloads-peer" + peerId + "/";
 		File f = new File(folder);
 		Boolean created = false;
-		if (!f.exists()){
+		if (!f.exists()) {
 			try {
 				created = f.mkdir();
-			}catch (Exception e){
-				System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+			} catch (Exception e) {
+				System.out
+				.println("Couldn't create the folder, the file will be saved in the current directory!");
 			}
-		}else {
+		} else {
 			created = true;
 		}
 
-		//if(i != -1) fileName = fileName + i;
+		// if(i != -1) fileName = fileName + i;
 
-		OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
+		OutputStream out = (created) ? new FileOutputStream(f.toString() + "/"
+				+ fileName) : new FileOutputStream(fileName);
 		Util.copy(dIn, out, fileSize);
 		out.close();
-		System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
+		System.out.println("File " + fileName + " received from peer "
+				+ peerAddress[0] + ":" + peerAddress[1]);
 	}
 
 	public boolean startIndexingServer(int port) {
@@ -214,16 +226,44 @@ public class Client extends Thread {
 	}
 
 	private void replicateFiles(int peerId) throws Exception {
-		String [] peerAddress = peerList.get(peerId).split(":");
-		Socket socket;
-		if(peerSocketList[peerId] == null) {
-			socket = new Socket(peerAddress[1], Integer.parseInt(peerAddress[2]));
+		String[] peerAddress = peerList.get(peerId).split(":");
+		Socket socket = null;
+		if (peerSocketList[peerId] == null) {
+			try {
+				socket = new Socket(peerAddress[0],
+						Integer.parseInt(peerAddress[1]));
+			} catch (Exception e) {
+				System.out.println("Peer " + peerId + " is down.");
+				throw new Exception();
+			}
 			addPeerSocket(socket, peerId);
 		} else {
 			socket = getPeerSocketList()[peerId];
 		}
-		for(String file : peer.getFileNames()){
-			
+		// int id;
+		for (String fileName : peer.getFileNames()) {
+			// id = DistributedHashtable.hash(file, peerList.size());
+			DataOutputStream dOut = new DataOutputStream(
+					socket.getOutputStream());
+			// download option
+			dOut.writeByte(1);
+			dOut.flush();
+			dOut.writeInt(peer.getPeerId());
+			dOut.flush();
+			dOut.writeUTF(fileName);
+			dOut.flush();
+			InputStream in = new FileInputStream(peer.getDirectory() + "/"
+					+ fileName);
+			long fileSize = new File(peer.getDirectory() + "/" + fileName)
+			.length();
+			dOut.writeLong(fileSize);
+			dOut.flush();
+			System.out.println("fileSize writen");
+
+			Util.copy(in, dOut, fileSize);
+			in.close();
+			System.out
+			.println("File " + fileName + " sent for replication");
 		}
 
 	}
@@ -302,37 +342,37 @@ public class Client extends Thread {
 						continue;
 					}
 					for (int i = 1; i <= value.size(); i++) {
-						System.out.println("\t" + i + " - " + value.get(i-1));
+						System.out.println("\t" + i + " - " + value.get(i - 1));
 					}
-					while(true){
+					while (true) {
 						System.out.print("Peer: ");
 						downopt = scanner.nextInt();
-						if(downopt < 0 || downopt > value.size())
+						if (downopt < 0 || downopt > value.size())
 							continue;
-						download(key,downopt-1,value.get(downopt-1));
+						download(key, downopt - 1, value.get(downopt - 1));
 						System.out.println("File downloaded!");
 						break;
 					}
 
-				} else if(option ==4) {
+				} else if (option == 4) {
 					System.out.println("Bye bye!");
 					scanner.close();
 					return;
-				}else {
+				} else {
 
 					System.out.println("Option not valid");
 					continue;
 				}
 			} catch (Exception e) {
-				//e.printStackTrace();
+				// e.printStackTrace();
 				System.out.println("Oops, something went wrong.");
 				scanner = new Scanner(System.in);
-				//break;
+				// break;
 			}
 		}
 	}
 
-	public static void startServers(final Peer peer){
+	public static void startServers(final Peer peer) {
 		new Thread() {
 			public void run() {
 				try {
@@ -354,7 +394,7 @@ public class Client extends Thread {
 		}.start();
 	}
 
-	public static void startOpenServer(final Peer peer){
+	public static void startOpenServer(final Peer peer) {
 		new Thread() {
 			public void run() {
 				try {
@@ -418,9 +458,8 @@ public class Client extends Thread {
 		final Peer peer = new Peer(id, address, port, dir, fileNames,
 				fileNames.size());
 
-		//startServers(peer);
+		// startServers(peer);
 		startOpenServer(peer);
-
 
 		String[] serverAddress;
 
@@ -428,9 +467,10 @@ public class Client extends Thread {
 
 		Client c = new Client(peer);
 
+		int i;
 		// checking if all are open
-		for (id = 0; id < serverList.size(); id++) {
-			serverAddress = serverList.get(id).split(":");
+		for (i = 0; i < serverList.size(); i++) {
+			serverAddress = serverList.get(i).split(":");
 			address = serverAddress[0];
 			port = Integer.parseInt(serverAddress[1]);
 
@@ -445,17 +485,22 @@ public class Client extends Thread {
 				// System.out.println("Not connected to server " + address + ":"
 				// + port);
 				// System.out.println("Trying again");
-				id--;
+				i--;
 				port--;
 			}
 		}
 		c.setServerSocketList(serverSocketList);
 
-		try {
-			c.replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
-		} catch (Exception e) {
-			e.printStackTrace();
+		while(true){
+			try {
+				c.replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
+				break;
+			} catch (Exception e) {
+				//e.printStackTrace();
+				System.out.println("Cannot replicate, trying again...");
+			}
 		}
+
 		c.userInterface();
 		System.exit(1);
 	}
