@@ -24,33 +24,31 @@ public class OpenServer extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				
 				String fileName;
 				long fileSize;
-				System.out.println("here");
 				DataInputStream dIn = new DataInputStream(
 						socket.getInputStream());
 
 				byte option = dIn.readByte();
 				switch (option) {
 				case 0:
-					//download
+					// download
 					fileName = dIn.readUTF();
-					System.out.println("fileName read " + fileName);
+					//System.out.println("fileName read " + fileName);
 					InputStream in = new FileInputStream(directory + "/"
 							+ fileName);
-					fileSize = new File(directory + "/" + fileName)
-							.length();
+					fileSize = new File(directory + "/" + fileName).length();
 					DataOutputStream dOut = new DataOutputStream(
 							socket.getOutputStream());
 					dOut.writeLong(fileSize);
 					dOut.flush();
-					System.out.println("fileSize writen");
+					//System.out.println("fileSize writen");
 
 					Util.copy(in, dOut, fileSize);
 					in.close();
+					break;
 				case 1:
-					//replicating files
+					// replicating files
 					int peerId = dIn.readInt();
 					fileName = dIn.readUTF();
 					System.out.println("fileName read " + fileName);
@@ -59,26 +57,31 @@ public class OpenServer extends Thread {
 					String folder = "replication-peer" + peerId + "/";
 					File f = new File(folder);
 					Boolean created = false;
-					if (!f.exists()){
+					if (!f.exists()) {
 						try {
 							created = f.mkdir();
-						}catch (Exception e){
-							System.out.println("Couldn't create the folder, the file will be saved in the current directory!");
+						} catch (Exception e) {
+							System.out
+									.println("Couldn't create the folder, the file will be saved in the current directory!");
 						}
-					}else {
+					} else {
 						created = true;
 					}
 
-					OutputStream out = (created) ? new FileOutputStream(f.toString() + "/" + fileName) : new FileOutputStream(fileName);
+					OutputStream out = (created) ? new FileOutputStream(
+							f.toString() + "/" + fileName)
+							: new FileOutputStream(fileName);
 					Util.copy(dIn, out, fileSize);
 					out.close();
-					System.out.println("File " + fileName + " received from peer " + peerId);
+					System.out.println("File " + fileName
+							+ " received from peer " + peerId);
+					break;
 				default:
 					throw new Exception();
 				}
 			}
 		} catch (Exception e) {
-			// ioe.printStackTrace();
+			//e.printStackTrace();
 		}
 
 	}

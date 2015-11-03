@@ -273,8 +273,10 @@ public class Client extends Thread {
 		String key = null;
 		Boolean result = false;
 		ArrayList<String> value;
+		
+		int id = peer.getPeerId();
 
-		System.out.println("Runnning as Peer " + peer.getPeerId());
+		System.out.println("Runnning as Peer " + id);
 
 		Scanner scanner = new Scanner(System.in);
 		while (true) {
@@ -292,6 +294,16 @@ public class Client extends Thread {
 						result = registry(true);
 					} catch (Exception e) {
 						System.out.println("Couldn't registry in the system.");
+					}
+					
+					while(true){
+						try {
+							replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
+							break;
+						} catch (Exception e) {
+							//e.printStackTrace();
+							System.out.println("Cannot replicate, trying again...");
+						}
 					}
 
 					System.out.println(result ? "Registered!"
@@ -490,16 +502,6 @@ public class Client extends Thread {
 			}
 		}
 		c.setServerSocketList(serverSocketList);
-
-		while(true){
-			try {
-				c.replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
-				break;
-			} catch (Exception e) {
-				//e.printStackTrace();
-				System.out.println("Cannot replicate, trying again...");
-			}
-		}
 
 		c.userInterface();
 		System.exit(1);
