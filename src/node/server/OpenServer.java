@@ -34,19 +34,22 @@ public class OpenServer extends Thread {
 				switch (option) {
 				case 0:
 					// download
+					
 					fileName = dIn.readUTF();
 					//System.out.println("fileName read " + fileName);
-					InputStream in = new FileInputStream(directory + "/"
-							+ fileName);
-					fileSize = new File(directory + "/" + fileName).length();
-					dOut = new DataOutputStream(
-							socket.getOutputStream());
+					File file = new File(directory + "/"+ fileName);
+					InputStream in = new FileInputStream(file);
+					fileSize = file.length();
+					//System.out.println("trying");
+					dOut = new DataOutputStream(socket.getOutputStream());
+					//System.out.println("writing");
 					dOut.writeLong(fileSize);
 					dOut.flush();
 					//System.out.println("fileSize writen");
 
 					Util.copy(in, dOut, fileSize);
 					in.close();
+
 					break;
 				case 1:
 					// replicating files
@@ -85,7 +88,7 @@ public class OpenServer extends Thread {
 				}
 			}
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 
 	}

@@ -1,44 +1,39 @@
 package bench;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import node.Peer;
 import node.client.Client;
 
 public class DownloadThread extends Thread{
-	
+
 	private Client client;
 	private int operations;
-	
-	public DownloadThread(Client client, int operations){
+	private int numClients;
+
+	public DownloadThread(Client client, int operations, int numClients) {
 		this.client = client;
 		this.operations = operations;
+		this.numClients = numClients;
 	}
-	
+
 	public void run(){
-		
-		long start = System.currentTimeMillis();
-		
-		Random rand = new Random();
-		
+
 		String fileName;
-		
+
 		ArrayList<Peer> result;
-		
+		int j = 0;
+
 		for(int i = 0; i < operations; i++){
-			rand.setSeed(System.currentTimeMillis() * client.getPeer().getPeerId());
-			fileName = "file-p" + rand.nextInt(8) + "-0" + rand.nextInt(8);
+			fileName = "file-p" + (j++) + "-0" + i;
+			if(j == numClients) j = 0;
 			try {
 				result = client.search(fileName, false);
-				client.download(fileName, client.getPeer().getPeerId(), result.get(0).toString());
+				//System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				client.download(fileName, result.get(0).getPeerId(), result.get(0).toString());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Time for doing " + operations + " downloads in peer " + client.getPeer().getPeerId() + " was " + (System.currentTimeMillis() - start) + "ms.");
-		
 	}
-
-
 }

@@ -121,7 +121,7 @@ public class Bench {
 		Client client;
 		for (int i = 0; i < clients.size(); i++) {
 			client = clients.get(i);
-			Evaluate ev = new Evaluate(client, operations);
+			Evaluate ev = new Evaluate(client, operations, clients.size());
 			ev.start();
 			evaluateThreads.add(ev);
 		}
@@ -131,7 +131,7 @@ public class Bench {
 		}
 
 		System.out.println("Overall Time for doing " + operations
-				+ " operations with 8 clients "
+				+ " operations with " + clients.size() +" clients "
 				+ (System.currentTimeMillis() - start) + "ms.");
 
 	}

@@ -1,30 +1,29 @@
 package bench;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import node.Peer;
 import node.client.Client;
 
 public class Evaluate extends Thread {
 	private Client client;
 	private int operations;
+	private int numClients;
 
-	public Evaluate(Client client, int operations) {
+	public Evaluate(Client client, int operations, int numClients) {
 		this.client = client;
 		this.operations = operations;
+		this.numClients = numClients;
 	}
 
 	public void run() {
 		long start = System.currentTimeMillis();
 		long startTime = start;
 
-		for (int i = 0; i < operations; i++) {
-			try {
-				client.registry(false);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		RegistryThread rt = new RegistryThread(client, operations);
+		rt.start();
+		
+		try {
+			rt.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 		}
 
 		System.out.println("Time for registry peer "
@@ -33,39 +32,30 @@ public class Evaluate extends Thread {
 
 		start = System.currentTimeMillis();
 
-		Random rand = new Random(System.currentTimeMillis());
-
-		String fileName;
-
-		for (int i = 0; i < operations; i++) {
-			fileName = "file-p" + rand.nextInt(8) + "-0" + rand.nextInt(8);
-			try {
-				client.search(fileName, false);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		SearchThread st = new SearchThread(client, operations, numClients);
+		st.start();
+		
+		try {
+			st.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 		}
+		
 		System.out.println("Time for doing " + operations
 				+ " searches in peer " + client.getPeer().getPeerId() + " was "
 				+ (System.currentTimeMillis() - start) + "ms.");
 
 		start = System.currentTimeMillis();
 
-		rand = new Random();
+		DownloadThread dt = new DownloadThread(client, operations, numClients);
+		dt.start();
 		
-		ArrayList<Peer> result;
-
-		for (int i = 0; i < operations; i++) {
-			rand.setSeed(System.currentTimeMillis() * client.getPeer().getPeerId());
-			fileName = "file-p" + rand.nextInt(8)+ "-0" + rand.nextInt(8);
-			try {
-				result = client.search(fileName, false);
-				//System.out.println(client.getPeer().getPeerId() + " " + fileName + " " + result.size());
-				client.download(fileName, client.getPeer().getPeerId(), result.get(0).toString());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		try {
+			dt.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
 		}
+		
 		System.out.println("Time for doing " + operations
 				+ " downloads in peer " + client.getPeer().getPeerId() + " was "
 				+ (System.currentTimeMillis() - start) + "ms.");

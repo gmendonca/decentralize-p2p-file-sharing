@@ -12,7 +12,6 @@ public class RegistryThread extends Thread{
 	}
 
 	public void run(){
-		long start = System.currentTimeMillis();
 
 		for(int i = 0; i < operations; i++){
 			try{
@@ -21,7 +20,5 @@ public class RegistryThread extends Thread{
 				e.printStackTrace();
 			}
 		}
-
-		System.out.println("Time for registry peer " + client.getPeer().getPeerId() + " "+operations+" times was " + (System.currentTimeMillis() - start) + "ms.");
 	}
 }

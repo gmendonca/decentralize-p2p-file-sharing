@@ -1,39 +1,35 @@
 package bench;
 
-import java.util.Random;
-
 import node.client.Client;
 
 public class SearchThread extends Thread{
-	
+
 	private Client client;
 	private int operations;
-	
-	public SearchThread(Client client, int operations){
+	private int numClients;
+
+	public SearchThread(Client client, int operations, int numClients) {
 		this.client = client;
 		this.operations = operations;
+		this.numClients = numClients;
 	}
-	
+
+
 	public void run(){
-		
-		long start = System.currentTimeMillis();
-		
-		Random rand = new Random();
-		
+
+
 		String fileName;
-		
+		int j = 0;
+
 		for(int i = 0; i < operations; i++){
-			rand.setSeed(System.currentTimeMillis() * client.getPeer().getPeerId());
-			fileName = "file-p" + rand.nextInt(8) + "-0" + rand.nextInt(8);
+			fileName = "file-p" + (j++) + "-0" + i;
+			if(j == numClients) j = 0;
 			try {
 				client.search(fileName, false);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Time for doing "+operations+" searches in peer " + client.getPeer().getPeerId() + " was " + (System.currentTimeMillis() - start) + "ms.");
-		
+
 	}
-
-
 }
