@@ -21,6 +21,17 @@ public class Bench {
 
 	public static void main(String[] args) throws Exception {
 
+		if(args.length < 1){
+			System.out.println("Usage: java -jar build/OpenBench.jar <Number of operations>");
+			return;
+		}
+		
+		int operations = Integer.parseInt(args[0]);
+		if(operations < 0){
+			System.out.println("Number of operations should be a positive number!");
+			return;
+		}
+		
 		try {
 			peerList = DistributedHashtable.readConfigFile("peers");
 			serverList = DistributedHashtable.readConfigFile("servers");
@@ -108,7 +119,7 @@ public class Bench {
 		Client client;
 		for(int i = 0; i < clients.size(); i ++){
 			client = clients.get(i);
-			RegistryThread rt = new RegistryThread(client);
+			RegistryThread rt = new RegistryThread(client, operations);
 			rt.start();
 			registryThreads.add(rt);
 		}
@@ -117,14 +128,14 @@ public class Bench {
 			registryThreads.get(i).join();
 		}
 
-		System.out.println("Time for registry 8 clients " + (System.currentTimeMillis() - start) + "ms.");
+		System.out.println("Time for doing " + operations + " registrys with 8 clients " + (System.currentTimeMillis() - start) + "ms.");
 		
 		start = System.currentTimeMillis();
 		
 		ArrayList<Thread> searchThreads = new ArrayList<Thread>();
 		for(int i = 0; i < clients.size(); i ++){
 			client = clients.get(i);
-			SearchThread st = new SearchThread(client, 10000);
+			SearchThread st = new SearchThread(client, operations);
 			st.start();
 			searchThreads.add(st);
 		}
@@ -133,7 +144,7 @@ public class Bench {
 			searchThreads.get(i).join();
 		}
 		
-		System.out.println("Time for doing 10K searchs with 8 clients " + (System.currentTimeMillis() - start) + "ms.");
+		System.out.println("Time for doing " + operations + " searchs with 8 clients " + (System.currentTimeMillis() - start) + "ms.");
 		
 		
 

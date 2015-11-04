@@ -49,19 +49,18 @@ public class IndexingServer extends Thread {
 	}
 
 	public boolean registry(String fileName, String peer) throws Exception {
-		System.out.println(fileName + " " + peer + " at server " + serverSocket.getLocalPort());
+		//System.out.println(fileName + " " + peer + " at server " + serverSocket.getLocalPort());
 		String[] peerItems = peer.split(":");
+		
+		Peer p = new Peer(Integer.parseInt(peerItems[0]), peerItems[1],
+				Integer.parseInt(peerItems[2]), peerItems[3]);
 		try {
 			if (index.containsKey(fileName)) {
-				index.get(fileName).add(
-						new Peer(Integer.parseInt(peerItems[0]), peerItems[1],
-								Integer.parseInt(peerItems[2]), peerItems[3]));
+				index.get(fileName).add(p);
 				return true;
 			} else {
 				index.put(fileName, new ArrayList<Peer>());
-				index.get(fileName).add(
-						new Peer(Integer.parseInt(peerItems[0]), peerItems[1],
-								Integer.parseInt(peerItems[2]), peerItems[3]));
+				index.get(fileName).add(p);
 				return true;
 			}
 		} catch (Exception e) {

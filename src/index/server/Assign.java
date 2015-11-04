@@ -6,7 +6,6 @@ import java.util.concurrent.Executors;
 
 public class Assign extends Thread {
 
-	private int numThreads = 8;
 	private IndexingServer indexingServer;
 
 	public Assign(IndexingServer indexingServer) {
@@ -14,7 +13,7 @@ public class Assign extends Thread {
 	}
 
 	public void run() {
-		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		//ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
 		while (true) {
 			if (indexingServer.peekPeerQueue() == null) {
@@ -28,7 +27,8 @@ public class Assign extends Thread {
 			synchronized (indexingServer.getPeerQueue()) {
 				Socket socket = indexingServer.pollPeerQueue();
 				Task t = new Task(socket, indexingServer);
-				executor.execute(t);
+				t.start();
+				//executor.execute(t);
 			}
 		}
 	}

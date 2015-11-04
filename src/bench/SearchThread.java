@@ -1,5 +1,6 @@
 package bench;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import node.client.Client;
@@ -22,18 +23,15 @@ public class SearchThread extends Thread{
 		
 		String fileName;
 		
+		ArrayList<String> result;
+		
 		for(int i = 0; i < operations; i++){
 			fileName = "file-p" + rand.nextInt(10) + "-0" + rand.nextInt(10);
 			try {
-				client.search(fileName, false);
+				result = client.search(fileName, false);
+				//System.out.println(result.size());
 			} catch (Exception e) {
-				try {
-					client.search(fileName, true);
-				} catch (Exception e1) {
-					System.out
-					.println("Something went wrong and it couldn'd find the file.");
-					continue;
-				}
+				e.printStackTrace();
 			}
 		}
 		System.out.println("Time for doing 10K searches in peer " + client.getPeer().getPeerId() + " was " + (System.currentTimeMillis() - start) + "ms.");
