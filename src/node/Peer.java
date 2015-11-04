@@ -120,6 +120,17 @@ public class Peer implements Serializable{
 		return peerId + ":" + address + ":" + port + ":" + directory;
 	}
 	
+	// Override
+	public boolean equals(Object other){
+		if (other == null) return false;
+	    if (other == this) return true;
+	    if (!(other instanceof Peer))return false;
+	    Peer otherPeer = (Peer)other;
+		if(otherPeer.getPeerId() == this.peerId) return true;
+		return false;
+		
+	}
+	
 	public void openServer() throws IOException {
 		
 		try {
