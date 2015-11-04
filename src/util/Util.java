@@ -27,7 +27,7 @@ public class Util {
 		//System.out.println("fileSize = " + fileSize);
 		byte[] buffer = new byte[1024];
 		int count = 0, total = 0;
-		long start = System.currentTimeMillis();
+		//long start = System.currentTimeMillis();
 		while (total != fileSize) {
 			count = in.read(buffer);
 			//System.out.println("count = " + count);
@@ -35,8 +35,7 @@ public class Util {
 			total += count;
 		}
 		out.flush();
-		System.out.println("Download took "
-				+ (System.currentTimeMillis() - start) + " ms.");
+		//System.out.println("Download took " + (System.currentTimeMillis() - start) + " ms.");
 	}
 
 	public static long toSeconds(long start, long end) {

@@ -192,7 +192,8 @@ public class Client extends Thread {
 		} else {
 			socket = getPeerSocketList()[peerId];
 		}
-
+		
+		synchronized(socket){
 		//System.out.println("here");
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 		// download option
@@ -225,8 +226,8 @@ public class Client extends Thread {
 				+ fileName) : new FileOutputStream(fileName);
 		Util.copy(dIn, out, fileSize);
 		out.close();
-		System.out.println("File " + fileName + " received from peer "
-				+ peerAddress[0] + ":" + peerAddress[1]);
+		//System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
+		}
 	}
 
 	public boolean startIndexingServer(int port) {
