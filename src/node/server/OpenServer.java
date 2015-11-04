@@ -50,12 +50,12 @@ public class OpenServer extends Thread {
 					break;
 				case 1:
 					// replicating files
-					System.out.println("here");
+					//System.out.println("here");
 					int peerId = dIn.readInt();
 					fileName = dIn.readUTF();
-					System.out.println("fileName read " + fileName);
+					//System.out.println("fileName read " + fileName);
 					fileSize = dIn.readLong();
-					System.out.println("fileSize read = " + fileSize);
+					//System.out.println("fileSize read = " + fileSize);
 					String folder = "replication-peer" + peerId + "/";
 					File f = new File(folder);
 					Boolean created = false;

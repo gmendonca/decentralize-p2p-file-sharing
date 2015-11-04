@@ -193,18 +193,18 @@ public class Client extends Thread {
 			socket = getPeerSocketList()[peerId];
 		}
 
-		System.out.println("here");
+		//System.out.println("here");
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 		// download option
 		dOut.writeByte(0);
 		dOut.flush();
 		dOut.writeUTF(fileName);
 		dOut.flush();
-		System.out.println("name writen");
+		//System.out.println("name writen");
 
 		DataInputStream dIn = new DataInputStream(socket.getInputStream());
 		long fileSize = dIn.readLong();
-		System.out.println("fileSize read = " + fileSize);
+		//System.out.println("fileSize read = " + fileSize);
 		String folder = "downloads-peer" + peerId + "/";
 		File f = new File(folder);
 		Boolean created = false;

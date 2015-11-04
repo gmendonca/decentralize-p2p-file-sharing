@@ -22,16 +22,16 @@ public class Server extends Thread {
 
 	public void run() {
 		try {
-			System.out.println("here");	
+			//System.out.println("here");	
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			String fileName = dIn.readUTF();
-			System.out.println("fileName read " + fileName);
+			//System.out.println("fileName read " + fileName);
 			InputStream in = new FileInputStream(directory + "/" + fileName);
 			long fileSize = new File(directory + "/" + fileName).length();
 			DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 			dOut.writeLong(fileSize);
 			dOut.flush();
-			System.out.println("fileSize writen");
+			//System.out.println("fileSize writen");
 
 			Util.copy(in, dOut, fileSize);
 			in.close();

@@ -24,7 +24,7 @@ public class Util {
 
 	public static void copy(InputStream in, OutputStream out, long fileSize)
 			throws IOException {
-		System.out.println("fileSize = " + fileSize);
+		//System.out.println("fileSize = " + fileSize);
 		byte[] buffer = new byte[1024];
 		int count = 0, total = 0;
 		long start = System.currentTimeMillis();

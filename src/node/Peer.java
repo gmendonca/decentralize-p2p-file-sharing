@@ -140,9 +140,9 @@ public class Peer implements Serializable{
 		}
 
 		while (true) {
-			System.out.println("waiting for connection");
+			//System.out.println("waiting for connection");
 			Socket socket = serverSocket.accept();
-			System.out.println("connection accepted");
+			//System.out.println("connection accepted");
 			OpenServer os = new OpenServer(socket,directory);
 			os.start();
 		}

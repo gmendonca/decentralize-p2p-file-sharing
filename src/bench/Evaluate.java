@@ -38,7 +38,7 @@ public class Evaluate extends Thread {
 		String fileName;
 
 		for (int i = 0; i < operations; i++) {
-			fileName = "file-p" + rand.nextInt(10) + "-0" + rand.nextInt(10);
+			fileName = "file-p" + rand.nextInt(8) + "-0" + rand.nextInt(8);
 			try {
 				client.search(fileName, false);
 			} catch (Exception e) {
@@ -56,9 +56,10 @@ public class Evaluate extends Thread {
 		ArrayList<Peer> result;
 
 		for (int i = 0; i < operations; i++) {
-			fileName = "file-p" + rand.nextInt(10) + "-0" + rand.nextInt(10);
+			fileName = "file-p" + rand.nextInt(8) + "-0" + rand.nextInt(8);
 			try {
 				result = client.search(fileName, false);
+				//System.out.println(fileName + " " + result.size());
 				client.download(fileName, 0, result.get(0).toString());
 			} catch (Exception e) {
 				e.printStackTrace();
