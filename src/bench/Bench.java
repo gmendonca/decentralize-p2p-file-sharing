@@ -15,19 +15,19 @@ import util.DistributedHashtable;
 import util.Util;
 
 public class Bench {
-	
-	private static ArrayList<String> peerList;
-	private static ArrayList<String> serverList;
 
-	public static void main(String[] args) {
-		
+	public static ArrayList<String> peerList;
+	public static ArrayList<String> serverList;
+
+	public static void main(String[] args) throws Exception {
+
 		try {
 			peerList = DistributedHashtable.readConfigFile("peers");
 			serverList = DistributedHashtable.readConfigFile("servers");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		String[] serverAddress, peerAddress;
 		int port;
 		for(String server : serverList){
@@ -49,9 +49,9 @@ public class Bench {
 			Assign assign = new Assign(indexserver);
 			assign.start();
 		}
-		
+
 		ArrayList<Client> clients = new ArrayList<Client>();
-		
+
 		for(int id = 0; id <  peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
 			String address = peerAddress[0];
@@ -76,9 +76,9 @@ public class Bench {
 
 			Client c = new Client(peer);
 			c.startOpenServer();
-			
+
 			ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
-			
+
 			for (int i = 0; i < serverList.size(); i++) {
 				serverAddress = serverList.get(i).split(":");
 				address = serverAddress[0];
@@ -97,34 +97,26 @@ public class Bench {
 				}
 			}
 			c.setServerSocketList(serverSocketList);
-			
+
 			c.setPeerSocketList(new Socket[peerList.size()]);
 			clients.add(c);
 		}
-		
+
 		long start = System.currentTimeMillis();
-		
-		for(Client client : clients){
-			try {
-				client.registry(false);
-				client.registry(true);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-			while(true){
-				int id = client.getPeer().getPeerId();
-				try {
-					client.replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
-					break;
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("Cannot replicate, trying again...");
-					try { Thread.sleep(5000); } catch (Exception e1) { } 
-				}
-			}
+
+		ArrayList<Thread> registryThreads = new ArrayList<Thread>();
+		Client client;
+		for(int i = 0; i < clients.size(); i ++){
+			client = clients.get(i);
+			RegistryThread rt = new RegistryThread(client);
+			rt.start();
+			registryThreads.add(rt);
 		}
-		
+
+		for(int i = 0; i < clients.size(); i ++){
+			registryThreads.get(i).join();
+		}
+
 		System.out.println("Time for registry 8 clients " + (System.currentTimeMillis() - start) + "ms.");
 
 	}
