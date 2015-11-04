@@ -206,7 +206,7 @@ public class Client extends Thread {
 		DataInputStream dIn = new DataInputStream(socket.getInputStream());
 		long fileSize = dIn.readLong();
 		//System.out.println("fileSize read = " + fileSize);
-		String folder = "downloads-peer" + peerId + "/";
+		String folder = "downloads-peer" + this.peer.getPeerId() + "/";
 		File f = new File(folder);
 		Boolean created = false;
 		if (!f.exists()) {

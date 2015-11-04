@@ -29,7 +29,7 @@ public class DownloadThread extends Thread{
 			if(j == numClients) j = 0;
 			try {
 				result = client.search(fileName, false);
-				//System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
 				client.download(fileName, result.get(0).getPeerId(), result.get(0).toString());
 			} catch (Exception e) {
 				e.printStackTrace();
