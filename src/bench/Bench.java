@@ -119,7 +119,21 @@ public class Bench {
 
 		System.out.println("Time for registry 8 clients " + (System.currentTimeMillis() - start) + "ms.");
 		
+		start = System.currentTimeMillis();
+		
 		ArrayList<Thread> searchThreads = new ArrayList<Thread>();
+		for(int i = 0; i < clients.size(); i ++){
+			client = clients.get(i);
+			SearchThread st = new SearchThread(client, 10000);
+			st.start();
+			searchThreads.add(st);
+		}
+
+		for(int i = 0; i < clients.size(); i ++){
+			searchThreads.get(i).join();
+		}
+		
+		System.out.println("Time for doing 10K searchs with 8 clients " + (System.currentTimeMillis() - start) + "ms.");
 		
 		
 
