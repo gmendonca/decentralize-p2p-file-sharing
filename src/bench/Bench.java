@@ -111,6 +111,18 @@ public class Bench {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			
+			while(true){
+				int id = client.getPeer().getPeerId();
+				try {
+					client.replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
+					break;
+				} catch (Exception e) {
+					e.printStackTrace();
+					System.out.println("Cannot replicate, trying again...");
+					try { Thread.sleep(5000); } catch (Exception e1) { } 
+				}
+			}
 		}
 		
 		System.out.println("Time for registry 8 clients " + (System.currentTimeMillis() - start) + "ms.");

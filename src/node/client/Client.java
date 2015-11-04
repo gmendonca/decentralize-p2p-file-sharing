@@ -238,7 +238,7 @@ public class Client extends Thread {
 		return true;
 	}
 
-	private void replicateFiles(int peerId) throws Exception {
+	public void replicateFiles(int peerId) throws Exception {
 		String[] peerAddress = peerList.get(peerId).split(":");
 		Socket socket = null;
 		if (peerSocketList[peerId] == null) {
