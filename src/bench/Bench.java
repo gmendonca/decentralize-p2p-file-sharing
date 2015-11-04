@@ -130,9 +130,11 @@ public class Bench {
 			evaluateThreads.get(i).join();
 		}
 
+		System.out.println("\n=================================================================");
 		System.out.println("Overall Time for doing " + operations
 				+ " operations with " + clients.size() +" clients "
 				+ (System.currentTimeMillis() - start) + "ms.");
+		System.out.println("\n=================================================================");
 
 	}
 
