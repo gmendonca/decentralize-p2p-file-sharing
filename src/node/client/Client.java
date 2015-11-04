@@ -118,7 +118,7 @@ public class Client extends Thread {
 					: pId;
 			socket = serverSocketList.get(pId);
 
-			// synchronized(socket){
+			//synchronized(socket){
 			DataOutputStream dOut = new DataOutputStream(
 					socket.getOutputStream());
 			// put option
@@ -130,12 +130,11 @@ public class Client extends Thread {
 			dOut.flush();
 			dOut.writeUTF(peer.toString());
 			dOut.flush();
-
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
 			ack = dIn.readBoolean();
 			if (ack == false)
 				break;
-			// }
+			//}
 		}
 
 		return ack;

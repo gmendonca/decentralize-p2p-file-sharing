@@ -35,7 +35,6 @@ public class Task extends Thread {
 				case 0:
 					// registry
 					fileName = dIn.readUTF();
-					// System.out.println(key);
 					peer = dIn.readUTF();
 					dOut = new DataOutputStream(socket.getOutputStream());
 					dOut.writeBoolean(indexingServer.registry(fileName, peer));
@@ -57,7 +56,7 @@ public class Task extends Thread {
 				}
 			}
 		} catch (Exception e) {
-			// System.out.println("Nothing happened");
+			//System.out.println("Nothing happened");
 			// e.printStackTrace();
 
 		}

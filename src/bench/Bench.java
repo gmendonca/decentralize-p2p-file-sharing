@@ -50,7 +50,7 @@ public class Bench {
 			assign.start();
 		}
 		
-		Client c1 = null;
+		ArrayList<Client> clients = new ArrayList<Client>();
 		
 		for(int id = 0; id <  peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
@@ -99,11 +99,21 @@ public class Bench {
 			c.setServerSocketList(serverSocketList);
 			
 			c.setPeerSocketList(new Socket[peerList.size()]);
-			if(id == 0) c1 = c;
-			
+			clients.add(c);
 		}
 		
-		c1.userInterface();
+		long start = System.currentTimeMillis();
+		
+		for(Client client : clients){
+			try {
+				client.registry(false);
+				client.registry(true);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Time for registry 8 clients " + (System.currentTimeMillis() - start) + "ms.");
 
 	}
 

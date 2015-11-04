@@ -49,7 +49,7 @@ public class IndexingServer extends Thread {
 	}
 
 	public boolean registry(String fileName, String peer) throws Exception {
-		System.out.println(fileName + " " + peer);
+		//System.out.println(fileName + " " + peer + " at server " + serverSocket.getLocalPort());
 		String[] peerItems = peer.split(":");
 		try {
 			if (index.containsKey(fileName)) {

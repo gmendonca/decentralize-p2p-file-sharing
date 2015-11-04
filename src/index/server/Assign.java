@@ -6,7 +6,7 @@ import java.util.concurrent.Executors;
 
 public class Assign extends Thread {
 
-	private int numThreads = 4;
+	private int numThreads = 8;
 	private IndexingServer indexingServer;
 
 	public Assign(IndexingServer indexingServer) {
