@@ -21,17 +21,19 @@ public class Bench {
 
 	public static void main(String[] args) throws Exception {
 
-		if(args.length < 1){
-			System.out.println("Usage: java -jar build/OpenBench.jar <Number of operations>");
+		if (args.length < 1) {
+			System.out
+					.println("Usage: java -jar build/OpenBench.jar <Number of operations>");
 			return;
 		}
-		
+
 		int operations = Integer.parseInt(args[0]);
-		if(operations < 0){
-			System.out.println("Number of operations should be a positive number!");
+		if (operations < 0) {
+			System.out
+					.println("Number of operations should be a positive number!");
 			return;
 		}
-		
+
 		try {
 			peerList = DistributedHashtable.readConfigFile("peers");
 			serverList = DistributedHashtable.readConfigFile("servers");
@@ -41,7 +43,7 @@ public class Bench {
 
 		String[] serverAddress, peerAddress;
 		int port;
-		for(String server : serverList){
+		for (String server : serverList) {
 			serverAddress = server.split(":");
 			port = Integer.parseInt(serverAddress[1]);
 
@@ -63,7 +65,7 @@ public class Bench {
 
 		ArrayList<Client> clients = new ArrayList<Client>();
 
-		for(int id = 0; id <  peerList.size(); id++) {
+		for (int id = 0; id < peerList.size(); id++) {
 			peerAddress = peerList.get(id).split(":");
 			String address = peerAddress[0];
 			port = Integer.parseInt(peerAddress[1]);
@@ -96,8 +98,8 @@ public class Bench {
 				port = Integer.parseInt(serverAddress[1]);
 
 				try {
-					System.out.println("Testing connection to server " + address
-							+ ":" + port);
+					System.out.println("Testing connection to server "
+							+ address + ":" + port);
 					Socket s = new Socket(address, port);
 					serverSocketList.add(s);
 					System.out.println("Server " + address + ":" + port
@@ -115,38 +117,22 @@ public class Bench {
 
 		long start = System.currentTimeMillis();
 
-		ArrayList<Thread> registryThreads = new ArrayList<Thread>();
+		ArrayList<Thread> evaluateThreads = new ArrayList<Thread>();
 		Client client;
-		for(int i = 0; i < clients.size(); i ++){
+		for (int i = 0; i < clients.size(); i++) {
 			client = clients.get(i);
-			RegistryThread rt = new RegistryThread(client, operations);
-			rt.start();
-			registryThreads.add(rt);
+			Evaluate ev = new Evaluate(client, operations);
+			ev.start();
+			evaluateThreads.add(ev);
 		}
 
-		for(int i = 0; i < clients.size(); i ++){
-			registryThreads.get(i).join();
+		for (int i = 0; i < clients.size(); i++) {
+			evaluateThreads.get(i).join();
 		}
 
-		System.out.println("Time for doing " + operations + " registrys with 8 clients " + (System.currentTimeMillis() - start) + "ms.");
-		
-		start = System.currentTimeMillis();
-		
-		ArrayList<Thread> searchThreads = new ArrayList<Thread>();
-		for(int i = 0; i < clients.size(); i ++){
-			client = clients.get(i);
-			SearchThread st = new SearchThread(client, operations);
-			st.start();
-			searchThreads.add(st);
-		}
-
-		for(int i = 0; i < clients.size(); i ++){
-			searchThreads.get(i).join();
-		}
-		
-		System.out.println("Time for doing " + operations + " searchs with 8 clients " + (System.currentTimeMillis() - start) + "ms.");
-		
-		
+		System.out.println("Overall Time for doing " + operations
+				+ " operations with 8 clients "
+				+ (System.currentTimeMillis() - start) + "ms.");
 
 	}
 

@@ -30,7 +30,7 @@ public class SearchThread extends Thread{
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Time for doing 10K searches in peer " + client.getPeer().getPeerId() + " was " + (System.currentTimeMillis() - start) + "ms.");
+		System.out.println("Time for doing "+operations+" searches in peer " + client.getPeer().getPeerId() + " was " + (System.currentTimeMillis() - start) + "ms.");
 		
 	}
 
