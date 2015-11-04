@@ -1,7 +1,9 @@
 package index.server;
 
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -44,14 +46,17 @@ public class Task extends Thread {
 					// lookup
 					fileName = dIn.readUTF();
 					peerList = indexingServer.lookup(fileName);
-					dOut = new DataOutputStream(socket.getOutputStream());
-					dOut.writeInt(peerList.size());
+					//dOut = new DataOutputStream(socket.getOutputStream());
+					ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+					/*dOut.writeInt(peerList.size());
 					dOut.flush();
 					if (peerList.size() != 0) {
 						for (Peer p : peerList)
 							dOut.writeUTF(p.toString());
 						dOut.flush();
-					}
+					}*/
+					oout.writeObject(peerList);
+					oout.flush();
 					break;
 				}
 			}

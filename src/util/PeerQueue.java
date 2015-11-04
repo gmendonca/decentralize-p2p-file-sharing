@@ -1,8 +1,10 @@
 package util;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class PeerQueue<T> {
+@SuppressWarnings("serial")
+public class PeerQueue<T> implements Serializable{
 
 	private LinkedList<T> queue;
 

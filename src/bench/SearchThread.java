@@ -1,6 +1,5 @@
 package bench;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import node.client.Client;
@@ -23,13 +22,10 @@ public class SearchThread extends Thread{
 		
 		String fileName;
 		
-		ArrayList<String> result;
-		
 		for(int i = 0; i < operations; i++){
 			fileName = "file-p" + rand.nextInt(10) + "-0" + rand.nextInt(10);
 			try {
-				result = client.search(fileName, false);
-				//System.out.println(result.size());
+				client.search(fileName, false);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

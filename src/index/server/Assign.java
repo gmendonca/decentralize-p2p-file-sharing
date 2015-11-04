@@ -1,8 +1,6 @@
 package index.server;
 
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Assign extends Thread {
 
@@ -13,7 +11,6 @@ public class Assign extends Thread {
 	}
 
 	public void run() {
-		//ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
 		while (true) {
 			if (indexingServer.peekPeerQueue() == null) {
@@ -28,7 +25,6 @@ public class Assign extends Thread {
 				Socket socket = indexingServer.pollPeerQueue();
 				Task t = new Task(socket, indexingServer);
 				t.start();
-				//executor.execute(t);
 			}
 		}
 	}

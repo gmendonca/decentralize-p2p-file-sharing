@@ -1,6 +1,7 @@
 package node;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -13,7 +14,8 @@ import node.client.Connection;
 import node.server.OpenServer;
 import node.server.Server;
 
-public class Peer {
+@SuppressWarnings("serial")
+public class Peer implements Serializable{
 
 	private int peerId;
 	private String address;

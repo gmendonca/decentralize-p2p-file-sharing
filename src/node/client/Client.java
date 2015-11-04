@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -36,10 +37,10 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public Client(Peer peer) {
 		this.peer = peer;
-		
+
 		try {
 			peerList = DistributedHashtable.readConfigFile("peers");
 			serverList = DistributedHashtable.readConfigFile("servers");
@@ -141,15 +142,16 @@ public class Client extends Thread {
 	}
 
 	// get
-	public ArrayList<String> search(String fileName, boolean resilience)
+	@SuppressWarnings("unchecked")
+	public ArrayList<Peer> search(String fileName, boolean resilience)
 			throws IOException {
 
 		int pId = DistributedHashtable.hash(fileName, serverList.size());
 		pId = resilience ? ((pId == serverList.size() - 1) ? 0 : pId + 1) : pId;
 		Socket socket = serverSocketList.get(pId);
 
-		ArrayList<String> resultList = new ArrayList<String>();
-		int numFiles;
+		//ArrayList<String> resultList = new ArrayList<String>();
+		//int numFiles;
 		// synchronized(socket){
 		DataOutputStream dOut = new DataOutputStream(socket.getOutputStream());
 
@@ -161,14 +163,22 @@ public class Client extends Thread {
 		dOut.writeUTF(fileName);
 		dOut.flush();
 
-		DataInputStream dIn = new DataInputStream(socket.getInputStream());
-		numFiles = dIn.readInt();
+		//DataInputStream dIn = new DataInputStream(socket.getInputStream());
+		/*numFiles = dIn.readInt();
 		for (int i = 0; i < numFiles; i++) {
 			resultList.add(dIn.readUTF());
 		}
-		// }
+		// }*/
+		ArrayList<Peer> readList = null;
+		ObjectInputStream oin = new ObjectInputStream(socket.getInputStream());
+		try {
+			readList = (ArrayList<Peer>) oin.readObject();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
 
-		return resultList;
+		return readList;
 	}
 
 	public void download(String fileName, int peerId, String peer)
@@ -289,8 +299,8 @@ public class Client extends Thread {
 		int option, downopt;
 		String key = null;
 		Boolean result = false;
-		ArrayList<String> value;
-		
+		ArrayList<Peer> value;
+
 		int id = peer.getPeerId();
 
 		System.out.println("Runnning as Peer " + id);
@@ -312,7 +322,7 @@ public class Client extends Thread {
 					} catch (Exception e) {
 						System.out.println("Couldn't registry in the system.");
 					}
-					
+
 					while(true){
 						try {
 							replicateFiles(id == peerList.size() - 1 ? 0 : id + 1);
@@ -347,8 +357,8 @@ public class Client extends Thread {
 						System.out.println("File not found in the system.");
 						continue;
 					}
-					for (String s : value) {
-						System.out.println(s);
+					for (Peer s : value) {
+						System.out.println(s.toString());
 					}
 
 				} else if (option == 3) {
@@ -379,7 +389,7 @@ public class Client extends Thread {
 						downopt = scanner.nextInt();
 						if (downopt < 0 || downopt > value.size())
 							continue;
-						download(key, downopt - 1, value.get(downopt - 1));
+						download(key, downopt - 1, value.get(downopt - 1).toString());
 						System.out.println("File downloaded!");
 						break;
 					}
@@ -437,7 +447,7 @@ public class Client extends Thread {
 	}
 
 	public static void main(String[] args) throws IOException {
-		
+
 		Client c = new Client();
 
 		if (args.length < 1) {
@@ -490,7 +500,7 @@ public class Client extends Thread {
 
 		ArrayList<Socket> serverSocketList = new ArrayList<Socket>();
 
-		
+
 		c.setPeer(peer);
 		// startServers();
 		c.startOpenServer();
@@ -518,7 +528,7 @@ public class Client extends Thread {
 			}
 		}
 		c.setServerSocketList(serverSocketList);
-		
+
 		c.setPeerSocketList(new Socket[peerList.size()]);
 
 		c.userInterface();
