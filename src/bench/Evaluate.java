@@ -1,5 +1,8 @@
 package bench;
 
+import java.util.ArrayList;
+
+import node.Peer;
 import node.client.Client;
 
 public class Evaluate extends Thread {
@@ -17,28 +20,33 @@ public class Evaluate extends Thread {
 		long start = System.currentTimeMillis();
 		long startTime = start;
 
-		RegistryThread rt = new RegistryThread(client, operations);
-		rt.start();
-		
-		try {
-			rt.join();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		for(int i = 0; i < operations; i++){
+			try{
+				client.registry(false);
+			} catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 
 		System.out.println("Time for registry peer "
 				+ client.getPeer().getPeerId() + " " + operations
 				+ " times was " + (System.currentTimeMillis() - start) + "ms.");
+		
+		String fileName;
+
+		ArrayList<Peer> result;
+		int j = 0;
 
 		start = System.currentTimeMillis();
 
-		SearchThread st = new SearchThread(client, operations, numClients);
-		st.start();
-		
-		try {
-			st.join();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		for(int i = 0; i < operations; i++){
+			fileName = "file-p" + (j++) + "-0" + i;
+			if(j == numClients) j = 0;
+			try {
+				client.search(fileName, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		System.out.println("Time for doing " + operations
@@ -47,13 +55,16 @@ public class Evaluate extends Thread {
 
 		start = System.currentTimeMillis();
 
-		DownloadThread dt = new DownloadThread(client, operations, numClients);
-		dt.start();
-		
-		try {
-			dt.join();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		for(int i = 0; i < operations; i++){
+			fileName = "file-p" + (j++) + "-0" + i;
+			if(j == numClients) j = 0;
+			try {
+				result = client.search(fileName, false);
+				System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				client.download(fileName, result.get(0).getPeerId(), result.get(0).toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		
 		System.out.println("Time for doing " + operations
