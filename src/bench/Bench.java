@@ -118,6 +118,10 @@ public class Bench {
 		}
 
 		System.out.println("Time for registry 8 clients " + (System.currentTimeMillis() - start) + "ms.");
+		
+		ArrayList<Thread> searchThreads = new ArrayList<Thread>();
+		
+		
 
 	}
 
