@@ -1,4 +1,4 @@
-package bench;
+package bench.local;
 
 import index.server.Assign;
 import index.server.IndexingServer;

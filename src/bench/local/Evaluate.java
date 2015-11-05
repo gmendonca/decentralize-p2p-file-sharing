@@ -1,4 +1,4 @@
-package bench;
+package bench.local;
 
 import java.util.ArrayList;
 import java.util.Random;
