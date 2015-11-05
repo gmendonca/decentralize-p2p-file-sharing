@@ -16,7 +16,6 @@ public class Throughput extends Thread {
 		
 		try {
 			long bytes;
-			System.out.println("Starting registry!");
 			client.registry(false);
 			System.out.println("Resgistered!");
 			
