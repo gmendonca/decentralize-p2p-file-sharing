@@ -28,7 +28,7 @@ public class Launch {
 		}
 
 		int bench = Integer.parseInt(args[0]);
-		if (bench != 0 || bench != 1) {
+		if (bench != 0 && bench != 1) {
 			System.out
 					.println("Bench Option should be 0 for benchmarking all the three operations or 1 for just thoughput");
 			return;
@@ -128,9 +128,9 @@ public class Launch {
 		Client client;
 		for (int i = 0; i < clients.size(); i++) {
 			client = clients.get(i);
-			Evaluate ev = new Evaluate(client, operations);
-			ev.start();
-			evaluateThreads.add(ev);
+			Thread thread = ((bench == 0) ? new Evaluate(client, operations) : new Throughput(client, operations));
+			thread.start();
+			evaluateThreads.add(thread);
 		}
 
 		for (int i = 0; i < clients.size(); i++) {
