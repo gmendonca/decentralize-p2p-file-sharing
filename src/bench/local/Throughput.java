@@ -30,7 +30,7 @@ public class Throughput extends Thread {
 					+ " downloads in peer " + client.getPeer().getPeerId() + " was "
 					+ time + " ms.");
 			
-			System.out.println("Thoughput = " + bytes/(time/1000) + " bytes/s.");
+			System.out.println("Thoughput of peer " +  + client.getPeer().getPeerId() + " = " + bytes/(time/1000) + " bytes/s.");
 			
 		} catch (Exception e) {
 			e.printStackTrace();

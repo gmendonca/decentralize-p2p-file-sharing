@@ -543,7 +543,7 @@ public class Client extends Thread {
 
 			try {
 				result = search(fileName, false);
-				//System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				//System.out.println(fileName + " " + result.size());
 				total_bytes += download(fileName, result.get(0).getPeerId(), result.get(0).toString());
 			} catch (Exception e) {
 				e.printStackTrace();
