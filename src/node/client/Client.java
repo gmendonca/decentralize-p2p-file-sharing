@@ -510,6 +510,11 @@ public class Client extends Thread {
 			try {
 				result = search(fileName, false);
 				//System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				if(result.size() == 0){
+					i--;
+					System.out.println(fileName + " " + result.size());
+					continue;
+				}
 				download(fileName, result.get(0).getPeerId(), result.get(0).toString());
 			} catch (Exception e) {
 				//e.printStackTrace();
