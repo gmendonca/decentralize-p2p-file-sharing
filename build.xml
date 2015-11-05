@@ -33,7 +33,7 @@
         </jar>
 
         <jar destfile="build/Bench.jar">
-          <fileset includes="node/*.class,node/server/*.class,node/client/*class,util/*.class,index/server/*.class,bench/*.class" dir="bin/"/>
+          <fileset includes="node/*.class,node/server/*.class,node/client/*class,util/*.class,index/server/*.class,bench/local/*.class" dir="bin/"/>
           <zipgroupfileset includes="*.jar" dir="lib/"/>
           <manifest>
             <attribute name="Main-Class" value="bench.Bench"/>
