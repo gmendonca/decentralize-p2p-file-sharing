@@ -14,7 +14,7 @@ import node.client.Client;
 import util.DistributedHashtable;
 import util.Util;
 
-public class Bench {
+public class Launch {
 
 	public static ArrayList<String> peerList;
 	public static ArrayList<String> serverList;

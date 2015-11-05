@@ -32,11 +32,19 @@
           </manifest>
         </jar>
 
-        <jar destfile="build/Bench.jar">
+        <jar destfile="build/LocalBench.jar">
           <fileset includes="node/*.class,node/server/*.class,node/client/*class,util/*.class,index/server/*.class,bench/local/*.class" dir="bin/"/>
           <zipgroupfileset includes="*.jar" dir="lib/"/>
           <manifest>
-            <attribute name="Main-Class" value="bench.local.Bench"/>
+            <attribute name="Main-Class" value="bench.local.Launch"/>
+          </manifest>
+        </jar>
+
+        <jar destfile="build/RemoteBench.jar">
+          <fileset includes="node/*.class,node/server/*.class,node/client/*class,util/*.class,index/server/*.class,bench/remote/*.class" dir="bin/"/>
+          <zipgroupfileset includes="*.jar" dir="lib/"/>
+          <manifest>
+            <attribute name="Main-Class" value="bench.remote.Launch"/>
           </manifest>
         </jar>
     </target>
