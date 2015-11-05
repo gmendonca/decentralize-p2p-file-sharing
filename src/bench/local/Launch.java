@@ -23,7 +23,7 @@ public class Launch {
 
 		if (args.length < 1) {
 			System.out
-					.println("Usage: java -jar build/OpenBench.jar <Number of operations>");
+					.println("Usage: java -jar build/LocalBench.jar <Number of operations>");
 			return;
 		}
 
