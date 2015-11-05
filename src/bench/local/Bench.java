@@ -121,7 +121,7 @@ public class Bench {
 		Client client;
 		for (int i = 0; i < clients.size(); i++) {
 			client = clients.get(i);
-			Evaluate ev = new Evaluate(client, operations, clients.size());
+			Evaluate ev = new Evaluate(client, operations);
 			ev.start();
 			evaluateThreads.add(ev);
 		}
