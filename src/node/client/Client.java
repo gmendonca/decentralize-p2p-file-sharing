@@ -538,14 +538,6 @@ public class Client extends Thread {
 			return;
 		}
 
-		// String address = args[1];
-
-		/*
-		 * int port = 0; try { port = Integer.parseInt(args[2]); } catch
-		 * (Exception e) { System.out.println("Put a valid port number");
-		 * return; }
-		 */
-
 		String[] peerAddress;
 		peerAddress = peerList.get(id).split(":");
 		String address = peerAddress[0];
