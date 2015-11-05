@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 import node.Peer;
@@ -445,6 +446,72 @@ public class Client extends Thread {
 				}
 			}
 		}.start();
+	}
+	
+	public void bench(int operations){
+		long start = System.currentTimeMillis();
+		long startTime = start;
+
+		for(int i = 0; i < operations; i++){
+			try{
+				registry(false);
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+		}
+
+		System.out.println("Time for registry peer "
+				+ peer.getPeerId() + " " + operations
+				+ " times was " + (System.currentTimeMillis() - start) + "ms.");
+		
+		String fileName;
+
+		ArrayList<Peer> result;
+		Random rand = new Random();
+		int j = 0;
+
+		start = System.currentTimeMillis();
+
+		for(int i = 0; i < operations; i++){
+			//fileName = "file-p" + (j++) + "-0" + i;
+			rand.setSeed(System.currentTimeMillis() + j++);
+			rand.nextInt(j);
+			fileName = "file-p" + rand.nextInt(peerList.size()) + "-0" + rand.nextInt(peer.getNumFiles());
+			try {
+				search(fileName, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Time for doing " + operations
+				+ " searches in peer " + peer.getPeerId() + " was "
+				+ (System.currentTimeMillis() - start) + "ms.");
+
+		start = System.currentTimeMillis();
+
+		for(int i = 0; i < operations; i++){
+			//fileName = "file-p" + (j++) + "-0" + i;
+			rand.setSeed(System.currentTimeMillis() + j++);
+			rand.nextInt(j);
+			fileName = "file-p" + rand.nextInt(peerList.size()) + "-0" + rand.nextInt(peer.getNumFiles());
+
+			try {
+				result = search(fileName, false);
+				//System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				download(fileName, result.get(0).getPeerId(), result.get(0).toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("Time for doing " + operations
+				+ " downloads in peer " + peer.getPeerId() + " was "
+				+ (System.currentTimeMillis() - start) + "ms.");
+
+		System.out.println("Overall Time for doing " + operations
+				+ " operations with in peer " + peer.getPeerId() + " was "
+				+ (System.currentTimeMillis() - startTime) + "ms.");
 	}
 
 	public static void main(String[] args) throws IOException {
