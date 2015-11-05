@@ -182,7 +182,7 @@ public class Client extends Thread {
 		return readList;
 	}
 
-	public void download(String fileName, int peerId, String peer)
+	public long download(String fileName, int peerId, String peer)
 			throws Exception {
 		String[] peerAddress = peer.split(":");
 		Socket socket;
@@ -229,6 +229,7 @@ public class Client extends Thread {
 		out.close();
 		//System.out.println("File " + fileName + " received from peer " + peerAddress[0] + ":" + peerAddress[1]);
 		//}
+		return fileSize;
 	}
 
 	public boolean startIndexingServer(int port) {
@@ -472,7 +473,7 @@ public class Client extends Thread {
 
 		System.out.println("Time for registry peer "
 				+ peer.getPeerId() + " " + operations
-				+ " times was " + (System.currentTimeMillis() - start) + "ms.");
+				+ " times was " + (System.currentTimeMillis() - start) + " ms.");
 		
 		String fileName;
 
@@ -496,7 +497,7 @@ public class Client extends Thread {
 		
 		System.out.println("Time for doing " + operations
 				+ " searches in peer " + peer.getPeerId() + " was "
-				+ (System.currentTimeMillis() - start) + "ms.");
+				+ (System.currentTimeMillis() - start) + " ms.");
 
 		start = System.currentTimeMillis();
 
@@ -517,11 +518,41 @@ public class Client extends Thread {
 		
 		System.out.println("Time for doing " + operations
 				+ " downloads in peer " + peer.getPeerId() + " was "
-				+ (System.currentTimeMillis() - start) + "ms.");
+				+ (System.currentTimeMillis() - start) + " ms.");
 
 		System.out.println("Overall Time for doing " + operations
 				+ " operations with in peer " + peer.getPeerId() + " was "
-				+ (System.currentTimeMillis() - startTime) + "ms.");
+				+ (System.currentTimeMillis() - startTime) + " ms.");
+	}
+	
+	public long bench_download(int operations){
+		
+		long total_bytes = 0;
+		String fileName;
+
+		ArrayList<Peer> result;
+		Random rand = new Random();
+		int j = 0;
+		
+
+		for(int i = 0; i < operations; i++){
+			//fileName = "file-p" + (j++) + "-0" + i;
+			rand.setSeed(System.currentTimeMillis() + j++);
+			rand.nextInt(j);
+			fileName = "file-p" + rand.nextInt(peerList.size()) + "-0" + rand.nextInt(peer.getNumFiles());
+
+			try {
+				result = search(fileName, false);
+				//System.out.println(client.getPeer().toString() + " " + fileName + " " + result.size());
+				total_bytes += download(fileName, result.get(0).getPeerId(), result.get(0).toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		
+		return total_bytes;
 	}
 
 	public static void main(String[] args) throws IOException {

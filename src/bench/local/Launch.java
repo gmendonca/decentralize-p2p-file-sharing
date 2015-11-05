@@ -21,13 +21,20 @@ public class Launch {
 
 	public static void main(String[] args) throws Exception {
 
-		if (args.length < 1) {
+		if (args.length < 2) {
 			System.out
-					.println("Usage: java -jar build/LocalBench.jar <Number of operations>");
+					.println("Usage: java -jar build/LocalBench.jar <Bench Option> <Number of operations>");
 			return;
 		}
 
-		int operations = Integer.parseInt(args[0]);
+		int bench = Integer.parseInt(args[0]);
+		if (bench != 0 || bench != 1) {
+			System.out
+					.println("Bench Option should be 0 for benchmarking all the three operations or 1 for just thoughput");
+			return;
+		}
+		
+		int operations = Integer.parseInt(args[1]);
 		if (operations < 0) {
 			System.out
 					.println("Number of operations should be a positive number!");
@@ -133,7 +140,7 @@ public class Launch {
 		System.out.println("\n=================================================================");
 		System.out.println("Overall Time for doing " + operations
 				+ " operations with " + clients.size() +" clients "
-				+ (System.currentTimeMillis() - start) + "ms.");
+				+ (System.currentTimeMillis() - start) + " ms.");
 		System.out.println("=================================================================");
 
 	}
