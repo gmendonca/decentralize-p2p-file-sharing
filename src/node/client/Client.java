@@ -298,7 +298,7 @@ public class Client extends Thread {
 	}
 
 	public void userInterface() {
-		int option, downopt;
+		int option, downopt, operations;
 		String key = null;
 		Boolean result = false;
 		ArrayList<Peer> value;
@@ -313,7 +313,8 @@ public class Client extends Thread {
 			System.out.println("\t1 - Registry");
 			System.out.println("\t2 - Search");
 			System.out.println("\t3 - Download");
-			System.out.println("\t4 - Close");
+			System.out.println("\t4 - Bench");
+			System.out.println("\t5 - Close");
 
 			try {
 				option = scanner.nextInt();
@@ -397,11 +398,20 @@ public class Client extends Thread {
 					}
 
 				} else if (option == 4) {
+					while (true) {
+						System.out.print("Number of operations: ");
+						operations = scanner.nextInt();
+						if (operations < 0)
+							continue;
+						bench(operations);
+						System.out.println("Benchmarked!");
+						break;
+					}
+				} else if (option == 5) {
 					System.out.println("Bye bye!");
 					scanner.close();
 					return;
-				} else {
-
+				}else {
 					System.out.println("Option not valid");
 					continue;
 				}
