@@ -78,8 +78,7 @@ public class OpenServer extends Thread {
 					: new FileOutputStream(fileName);
 					Util.copy(dIn, out, fileSize);
 					out.close();
-					System.out.println("File " + fileName
-									+ " received from peer " + peerId);
+					//System.out.println("File " + fileName + " received from peer " + peerId);
 					dOut = new DataOutputStream(socket.getOutputStream());
 					dOut.writeUTF("File recieved");
 					break;

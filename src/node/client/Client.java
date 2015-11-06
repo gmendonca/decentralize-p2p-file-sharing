@@ -284,15 +284,15 @@ public class Client extends Thread {
 			.length();
 			dOut.writeLong(fileSize);
 			dOut.flush();
-			System.out.println("fileSize writen");
+			//System.out.println("fileSize writen");
 
 			Util.copy(in, dOut, fileSize);
 			in.close();
-			System.out
-			.println("File " + fileName + " sent for replication");
+			//System.out.println("File " + fileName + " sent for replication");
 			DataInputStream dIn = new DataInputStream(socket.getInputStream());
-			System.out.println(dIn.readUTF());
-			System.out.println("File sent successfuly");
+			dIn.readUTF();
+			//System.out.println(dIn.readUTF());
+			//System.out.println("File sent successfuly");
 			//try { Thread.sleep(5); } catch (Exception e) { } 
 		}
 
@@ -362,7 +362,8 @@ public class Client extends Thread {
 						continue;
 					}
 					for (Peer s : value) {
-						System.out.println(s.toString());
+						String [] res = s.toString().split(":");
+						System.out.println("Peer " + res[0] + " (" + res[1] +":"+ res[2] + ") has the file!");
 					}
 
 				} else if (option == 3) {
@@ -386,7 +387,9 @@ public class Client extends Thread {
 						continue;
 					}
 					for (int i = 1; i <= value.size(); i++) {
-						System.out.println("\t" + i + " - " + value.get(i - 1));
+						String [] res = value.get(i - 1).toString().split(":");
+						System.out.println("\t" + i + " - " + "Peer " + res[0] + " (" + res[1] +":"+ res[2] + ")");
+						
 					}
 					while (true) {
 						System.out.print("Peer: ");
