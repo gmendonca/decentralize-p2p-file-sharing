@@ -4,7 +4,7 @@
 This project is a simple implementation of a Decentralized P2P File Sharing System
 with a Distributed Hashtable, using Java and Sockets.
 
-To compile the project, you need [Apache Ant](http://ant.apache.org/) and a [JSON file](https://code.google.com/p/json-simple/) lib under a lib folder.
+To compile the project, you need [Apache Ant](http://ant.apache.org/) and a [JSON lib](https://code.google.com/p/json-simple/) under a lib folder.
 And then just:
 
 ```sh
@@ -78,7 +78,14 @@ However, you still need to provide the folder and files.
 The files should be in the format ```file-p<PeerId>-0<Number>```, the script [createfiles.sh](https://github.com/gmendonca/decentralize-p2p-file-sharing/tree/master/scripts/createfiles.sh) create files using the this pattern. You can select the number of peers and files per peer and run it like that:
 
 ```sh
-$ sh configfiles.sh <NUMPEERS> <NUMFILES>
+$ sh scripts/configfiles.sh <NUMPEERS> <NUMFILES>
+```
+
+or
+
+```sh
+$ chmod +x scripts/configfiles.sh
+$ ./scripts/configfiles.sh <NUMPEERS> <NUMFILES>
 ```
 
 The <Bench Option> is two different approaches for the Benchmarking, The ```0``` option is the normal
