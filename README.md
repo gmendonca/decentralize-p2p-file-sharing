@@ -4,7 +4,8 @@
 This project is a simple implementation of a Decentralized P2P File Sharing System
 with a Distributed Hashtable, using Java and Sockets.
 
-To compile the project, you need [Apache Ant](http://ant.apache.org/). An then just:
+To compile the project, you need [Apache Ant](http://ant.apache.org/) and a [JSON file](https://code.google.com/p/json-simple/) lib under a lib folder.
+And then just:
 
 ```sh
 $ ant clean & ant compile & ant jar
