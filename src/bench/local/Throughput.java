@@ -17,7 +17,7 @@ public class Throughput extends Thread {
 		try {
 			long bytes;
 			client.registry(false);
-			System.out.println("Resgistered!");
+			System.out.println("Registered!");
 			
 			long start = System.currentTimeMillis();
 			
