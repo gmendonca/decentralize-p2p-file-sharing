@@ -550,6 +550,7 @@ public class Client extends Thread {
 				result = search(fileName, false);
 				//System.out.println(fileName + " " + result.size());
 				if(result.size() == 0){
+					System.out.println(fileName + " " + result.size());
 					i--;
 					continue;
 				}
